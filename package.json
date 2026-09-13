@@ -1,0 +1,16 @@
+{
+  "name": "i-robot-banned-books-ar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "scrape": "node scripts/scrape-book.mjs",
+    "compile:target": "node scripts/compile-target-server.mjs",
+    "check:target": "node scripts/check-target-freshness.mjs"
+  },
+  "devDependencies": {
+    "vite": "8.3.0"
+  }
+}

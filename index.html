@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#080808" />
+    <meta
+      name="description"
+      content="Scan the Bantam trade paperback cover of Isaac Asimov's I, Robot to reveal an augmented-reality book summary."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>I, Robot — Banned Books AR</title>
+    <script defer src="/vendor/aframe-1.6.0.min.js"></script>
+    <script defer src="/vendor/mindar-image-aframe-1.2.5.prod.js"></script>
+  </head>
+  <body data-phase="intro">
+    <main class="app-shell">
+      <section class="ar-stage" aria-label="Book cover scanner">
+        <a-scene
+          id="ar-scene"
+          mindar-image="imageTargetSrc: /assets/i-robot.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no;"
+          color-space="sRGB"
+          renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true; antialias: true;"
+          vr-mode-ui="enabled: false"
+          device-orientation-permission-ui="enabled: false"
+          embedded
+        >
+          <a-assets timeout="12000">
+            <img id="cover-texture" src="/assets/i-robot-cover.jpg" alt="" />
+          </a-assets>
+
+          <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+          <a-entity id="book-target" mindar-image-target="targetIndex: 0">
+            <a-entity
+              id="book-content"
+              position="0 0 0"
+              scale="0.001 0.001 0.001"
+              animation__reveal="property: scale; startEvents: reveal; from: 0.001 0.001 0.001; to: 1 1 1; dur: 520; easing: easeOutBack"
+            >
+              <a-plane
+                position="0 1.02 0.018"
+                width="1.68"
+                height="0.78"
+                material="shader: flat; color: #e93226; opacity: 0.98"
+              ></a-plane>
+              <a-plane
+                position="0 1.02 0.026"
+                width="1.62"
+                height="0.72"
+                material="shader: flat; color: #101010; opacity: 0.98"
+              ></a-plane>
+              <a-image
+                src="#cover-texture"
+                position="-0.56 1.02 0.042"
+                width="0.42"
+                height="0.634"
+                rotation="0 -7 -2"
+                material="shader: flat"
+                animation="property: position; from: -0.56 0.99 0.042; to: -0.56 1.05 0.042; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine"
+              ></a-image>
+              <a-text
+                id="ar-kicker"
+                value="FOUND / BANTAM TRADE PAPERBACK"
+                position="-0.28 1.25 0.045"
+                color="#ef3b2f"
+                width="1.2"
+                wrap-count="31"
+                font="kelsonsans"
+              ></a-text>
+              <a-text
+                id="ar-title"
+                value="I, ROBOT"
+                position="-0.28 1.13 0.045"
+                color="#fffaf0"
+                width="1.4"
+                wrap-count="20"
+                font="kelsonsans"
+              ></a-text>
+              <a-text
+                id="ar-summary"
+                value="Nine linked stories trace humanity's uneasy partnership with intelligent machines—and the loopholes hidden inside the Three Laws of Robotics."
+                position="-0.28 1.01 0.045"
+                color="#d8d5cd"
+                width="1.15"
+                wrap-count="38"
+                line-height="49"
+                font="kelsonsans"
+              ></a-text>
+            </a-entity>
+          </a-entity>
+        </a-scene>
+
+        <div class="camera-shade" aria-hidden="true"></div>
+
+        <header class="topbar">
+          <div class="project-mark" aria-label="Banned Books AR">
+            <span class="project-mark__index">01</span>
+            <span>BANNED<br />BOOKS AR</span>
+          </div>
+          <div id="status-chip" class="status-chip" role="status" aria-live="polite">
+            <span class="status-chip__dot" aria-hidden="true"></span>
+            <span id="status-label">READY</span>
+          </div>
+          <button id="exit-button" class="icon-button" type="button" aria-label="Stop camera">
+            <span aria-hidden="true">×</span>
+          </button>
+        </header>
+
+        <div id="scan-guide" class="scan-guide" aria-hidden="true">
+          <span class="corner corner--tl"></span>
+          <span class="corner corner--tr"></span>
+          <span class="corner corner--bl"></span>
+          <span class="corner corner--br"></span>
+          <span class="scan-line"></span>
+          <div class="scan-guide__label">ALIGN THE FULL COVER</div>
+        </div>
+
+        <div id="demo-card" class="demo-card" aria-hidden="true">
+          <div class="demo-card__beam"></div>
+          <img src="/assets/i-robot-cover.jpg" alt="I, Robot cover" />
+        </div>
+
+        <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">
+          <div class="intro-panel__edition">
+            <span>VERTICAL SLICE</span>
+            <span>ISBN 9780553382563</span>
+          </div>
+          <div class="intro-panel__book">
+            <img src="/assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
+            <div>
+              <p class="eyebrow">TARGET 01 / SCIENCE FICTION</p>
+              <h1 id="intro-title">I, Robot</h1>
+              <p class="author">Isaac Asimov</p>
+              <p class="instruction">Place the entire front cover inside the frame. Keep it flat and avoid glare.</p>
+            </div>
+          </div>
+          <button id="start-button" class="primary-button" type="button">
+            <span>START CAMERA</span>
+            <span aria-hidden="true">↗</span>
+          </button>
+          <button id="demo-button" class="text-button" type="button">Preview without a camera</button>
+          <p class="privacy-note">Camera video stays on this device and is not recorded.</p>
+        </section>
+
+        <section id="result-panel" class="result-panel" aria-labelledby="result-title" aria-hidden="true">
+          <div class="result-panel__handle" aria-hidden="true"></div>
+          <div class="result-panel__header">
+            <div>
+              <p class="eyebrow">COVER RECOGNIZED</p>
+              <h2 id="result-title">I, Robot</h2>
+            </div>
+            <span class="match-badge">MATCH 01</span>
+          </div>
+          <p id="result-summary" class="result-panel__summary"></p>
+          <div class="result-panel__meta">
+            <span id="edition-label">Bantam trade pbk. ed.</span>
+            <span>1950 / STORIES</span>
+          </div>
+          <a
+            class="catalog-link"
+            href="https://sjpl.bibliocommons.com/v2/record/S156C6635382"
+            target="_blank"
+            rel="noreferrer"
+          >
+            VIEW SJPL RECORD <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+
+        <div id="error-panel" class="error-panel" role="alert" aria-hidden="true">
+          <p class="eyebrow">CAMERA UNAVAILABLE</p>
+          <h2>Use the visual preview instead.</h2>
+          <p id="error-message">Camera access needs HTTPS or localhost and permission to use the rear camera.</p>
+          <div class="error-panel__actions">
+            <button id="retry-button" class="primary-button" type="button">TRY AGAIN</button>
+            <button id="fallback-button" class="text-button" type="button">Open preview</button>
+          </div>
+        </div>
+
+        <div class="scan-footer" aria-hidden="true">
+          <span id="scan-footer-copy">LOOKING FOR TARGET 01</span>
+          <span class="scan-footer__rule"></span>
+          <span>LIVE</span>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

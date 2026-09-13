@@ -1,0 +1,33 @@
+{
+  "recordId": "S156C6635382",
+  "recordUrl": "https://sjpl.bibliocommons.com/v2/record/S156C6635382",
+  "title": "I, Robot",
+  "authors": [
+    "Isaac Asimov"
+  ],
+  "edition": "Bantam trade pbk. ed.",
+  "publication": "New York : Bantam Books, 2008, ©1950",
+  "physicalDescription": "224 pages ; 21 cm",
+  "isbn": [
+    "9780553382563",
+    "055338256X"
+  ],
+  "coverUrl": "https://images.penguinrandomhouse.com/cover/9780553382563",
+  "catalogCoverUrl": "https://www.syndetics.com/index.aspx?isbn=9780553382563&issn=/LC.JPG&client=sanjosepl&type=xw12&oclc=53839993",
+  "coverPath": "/assets/i-robot-cover.jpg",
+  "targetPath": "/assets/i-robot.mind",
+  "displaySummary": "Nine linked stories follow the rise of intelligent robots and the people who build, test, fear, and depend on them. Asimov uses the Three Laws of Robotics to explore responsibility, power, and the uneasy line between human judgment and machine logic.",
+  "arSummary": "Nine linked stories trace humanity's uneasy partnership with intelligent machines—and the loopholes hidden inside the Three Laws of Robotics.",
+  "sourceDescription": "This classic science fiction masterwork weaves stories about robots, humanity, and the deep questions of existence into a novel of shocking intelligence and heart.",
+  "retrievedAt": "2026-09-13T00:00:00.226Z",
+  "provenance": {
+    "metadata": "SJPL / BiblioCommons JSON-LD",
+    "cover": "Penguin Random House ISBN cover endpoint; requires visual approval for the physical copy",
+    "coverSha256": "b801555f767fde3c4128740efac401f97604360eabf9809f4710664516d63570",
+    "coverReviewRequired": false,
+    "targetCoverSha256": "b801555f767fde3c4128740efac401f97604360eabf9809f4710664516d63570",
+    "targetCompiledAt": "2026-09-13T01:17:02.356Z",
+    "targetStale": false,
+    "targetCompiler": "MindAR 1.2.5"
+  }
+}

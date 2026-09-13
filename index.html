@@ -8,17 +8,17 @@
       name="description"
       content="Scan the Bantam trade paperback cover of Isaac Asimov's I, Robot to reveal an augmented-reality book summary."
     />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>I, Robot — Banned Books AR</title>
-    <script defer src="/vendor/aframe-1.6.0.min.js"></script>
-    <script defer src="/vendor/mindar-image-aframe-1.2.5.prod.js"></script>
+    <script defer src="./vendor/aframe-1.6.0.min.js"></script>
+    <script defer src="./vendor/mindar-image-aframe-1.2.5.prod.js"></script>
   </head>
   <body data-phase="intro">
     <main class="app-shell">
       <section class="ar-stage" aria-label="Book cover scanner">
         <a-scene
           id="ar-scene"
-          mindar-image="imageTargetSrc: /assets/i-robot.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no;"
+          mindar-image="imageTargetSrc: ./assets/i-robot.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no;"
           color-space="sRGB"
           renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true; antialias: true;"
           vr-mode-ui="enabled: false"
@@ -26,7 +26,7 @@
           embedded
         >
           <a-assets timeout="12000">
-            <img id="cover-texture" src="/assets/i-robot-cover.jpg" alt="" />
+            <img id="cover-texture" src="./assets/i-robot-cover.jpg" alt="" />
           </a-assets>
 
           <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -118,7 +118,7 @@
 
         <div id="demo-card" class="demo-card" aria-hidden="true">
           <div class="demo-card__beam"></div>
-          <img src="/assets/i-robot-cover.jpg" alt="I, Robot cover" />
+          <img src="./assets/i-robot-cover.jpg" alt="I, Robot cover" />
         </div>
 
         <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">
@@ -127,7 +127,7 @@
             <span>ISBN 9780553382563</span>
           </div>
           <div class="intro-panel__book">
-            <img src="/assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
+            <img src="./assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
             <div>
               <p class="eyebrow">TARGET 01 / SCIENCE FICTION</p>
               <h1 id="intro-title">I, Robot</h1>
@@ -184,6 +184,6 @@
         </div>
       </section>
     </main>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

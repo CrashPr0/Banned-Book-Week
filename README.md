@@ -2,6 +2,11 @@
 
 A mobile-first MindAR vertical slice for the 2008 Bantam trade paperback of *I, Robot* (ISBN 9780553382563). Point the camera at the full front cover and the app anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
 
+Deployments:
+
+- Private Sites build: https://i-robot-banned-books-ar.san-jose-sta-2217.chatgpt.site
+- Public GitHub Pages build: https://crashpr0.github.io/Banned-Book-Week/
+
 ## Run it
 
 ```bash

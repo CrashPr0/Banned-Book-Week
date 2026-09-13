@@ -161,7 +161,7 @@ function applyBookData(data) {
 
 async function loadBookData() {
   try {
-    const response = await fetch("/data/book.json", { cache: "no-store" });
+    const response = await fetch("./data/book.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`Book data returned ${response.status}`);
     applyBookData(await response.json());
   } catch (error) {

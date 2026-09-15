@@ -1,0 +1,172 @@
+{
+  "source": {
+    "type": "photographed installation plan",
+    "file": "Image_20260915_112452_784.jpeg",
+    "transcribedAt": "2026-09-15",
+    "note": "Titles and placements are transcribed from the photo. Call numbers and exact physical editions must be confirmed on site before AR target compilation."
+  },
+  "workflow": {
+    "catalog": "Use the catalogSearchUrl to select the record for the physical copy.",
+    "cover": "Record the ISBN and compare the downloaded cover with a straight-on photo of the physical cover.",
+    "target": "Compile the approved cover into the multi-target .mind file only after visual confirmation."
+  },
+  "books": [
+    {
+      "priority": 1,
+      "title": "Adventures of Huckleberry Finn",
+      "author": "Mark Twain",
+      "floor": "Third floor",
+      "placement": "Fiction TW to Fiction WA, near the windows; shares a vault with Harry Potter",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Adventures%20of%20Huckleberry%20Finn&searchType=title",
+      "catalogRecordUrl": "https://sjpl.bibliocommons.com/v2/record/S156C6530705",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/8157718-L.jpg",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "The Philosophy of Spinoza",
+      "author": "Baruch Spinoza",
+      "floor": "Third floor",
+      "placement": "Nonfiction 811.54, near the reference service desk",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=The%20Philosophy%20of%20Spinoza&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/10691937-L.jpg",
+      "editionStatus": "title and physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "Cancer (Touch Me Not)",
+      "alternateTitle": "Noli Me Tangere",
+      "author": "Jose Rizal",
+      "floor": "Third floor",
+      "placement": "342.7302",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Noli%20Me%20Tangere&searchType=title",
+      "editionStatus": "physical copy needed; title normalized from the sheet"
+    },
+    {
+      "priority": 3,
+      "title": "The Writings of Mengzi",
+      "alternateTitle": "Mencius",
+      "author": "Mengzi (Mencius)",
+      "floor": "Third floor",
+      "placement": "Near the language newspapers; unnamed stacks in front of them",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Mencius&searchType=title",
+      "editionStatus": "exact English title and physical copy needed"
+    },
+    {
+      "priority": 2,
+      "title": "Ulysses",
+      "author": "James Joyce",
+      "floor": "Sixth floor",
+      "placement": "DA 198",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Ulysses%20James%20Joyce&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/13136548-L.jpg",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "The Holy Qur'an",
+      "floor": "Sixth floor",
+      "placement": "DK 266; shares a vault with The Holy Bible",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Holy%20Quran&searchType=title",
+      "editionStatus": "translator, language, and physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "The Holy Bible",
+      "floor": "Sixth floor",
+      "placement": "DK 266; shares a vault with The Holy Qur'an",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Holy%20Bible&searchType=title",
+      "editionStatus": "translation and physical copy needed"
+    },
+    {
+      "priority": 2,
+      "title": "The Merchant of Venice",
+      "author": "William Shakespeare",
+      "floor": "Sixth floor",
+      "placement": "HD 9764 C3 G55; shares a vault with Emile",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Merchant%20of%20Venice&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/7182819-L.jpg",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "Emile, or On Education",
+      "author": "Jean-Jacques Rousseau",
+      "floor": "Sixth floor",
+      "placement": "HD 9764 C3 G55; shares a vault with The Merchant of Venice",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Emile%20Rousseau&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/989104-L.jpg",
+      "editionStatus": "exact title and physical copy needed"
+    },
+    {
+      "priority": 1,
+      "title": "This Earth of Mankind",
+      "author": "Pramoedya Ananta Toer",
+      "floor": "Seventh floor",
+      "placement": "R? 735.12 PR 3; shares a vault with The Satanic Verses",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=This%20Earth%20of%20Mankind&searchType=title",
+      "candidateIsbn": "9780140256352",
+      "coverCandidateUrl": "https://images.penguinrandomhouse.com/cover/9780140256352",
+      "editionStatus": "strong publisher candidate; compare with physical copy"
+    },
+    {
+      "priority": 1,
+      "title": "The Satanic Verses",
+      "author": "Salman Rushdie",
+      "floor": "Seventh floor",
+      "placement": "R? 735.12 PR 3; shares a vault with This Earth of Mankind",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=The%20Satanic%20Verses&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/8312209-L.jpg",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 3,
+      "title": "Selected Poems",
+      "author": "Chairil Anwar",
+      "floor": "Seventh floor",
+      "placement": "PL 2019 .S58X",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Selected%20Poems%20Chairil%20Anwar&searchType=title",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 2,
+      "title": "Dialogues Concerning Two New Sciences",
+      "author": "Galileo Galilei",
+      "floor": "Eighth floor",
+      "placement": "Near the astronomy equipment, Q? 25?",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Two%20New%20Sciences%20Galileo&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/10817653-L.jpg",
+      "editionStatus": "exact title and physical copy needed"
+    },
+    {
+      "priority": 1,
+      "title": "All Quiet on the Western Front",
+      "author": "Erich Maria Remarque",
+      "floor": "Eighth floor",
+      "placement": "T 1216",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=All%20Quiet%20on%20the%20Western%20Front&searchType=title",
+      "catalogRecordUrl": "https://sjpl.bibliocommons.com/v2/record/S156C2241781",
+      "editionStatus": "1982 Ballantine catalog candidate; compare with physical copy"
+    },
+    {
+      "priority": 2,
+      "title": "Candide",
+      "author": "Voltaire",
+      "floor": "Eighth floor",
+      "placement": "Folio PS 129",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=Candide%20Voltaire&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/12736044-L.jpg",
+      "editionStatus": "physical copy needed"
+    },
+    {
+      "priority": 2,
+      "title": "On the Origin of Species",
+      "author": "Charles Darwin",
+      "floor": "Lower level",
+      "placement": "New periodical section, near Canary Choir and the microfilm viewer",
+      "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/search?query=On%20the%20Origin%20of%20Species&searchType=title",
+      "coverCandidateUrl": "https://covers.openlibrary.org/b/id/7153600-L.jpg",
+      "editionStatus": "physical copy needed"
+    }
+  ]
+}

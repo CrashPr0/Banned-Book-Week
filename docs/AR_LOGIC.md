@@ -10,12 +10,12 @@ MindAR supports image targets in a static site, needs no project key, and gives 
 
 ```mermaid
 flowchart LR
-    A[Approved ISBN / catalog record] --> B[Curated book.json]
+    A[Approved ISBN / catalog record] --> B[Curated books.json]
     C[Publisher cover endpoint] --> D[Local cover + SHA-256]
     B --> E[Human edition check]
     D --> E
     E --> F[MindAR compiler]
-    F --> G[i-robot.mind]
+    F --> G[banned-books.mind]
     G --> H[Static HTTPS app]
     B --> H
     D --> H
@@ -31,8 +31,8 @@ Build-time content acquisition and runtime AR are separate on purpose. The deplo
 | --- | --- | --- |
 | `intro` | Page loaded or camera stopped | Shows exact edition and an explicit camera button. |
 | `starting` | User selects **Start camera** | Waits for the A-Frame scene, then calls `mindar-image-system.start()`. |
-| `scanning` | MindAR emits `arReady` | Shows the cover-shaped guide and scanning status. |
-| `tracked` | Target emits `targetFound` | Animates the target-anchored A-Frame card and opens the HTML summary sheet. |
+| `scanning` | MindAR emits `arReady` | Shows the cover-shaped guide and searches all five compiled targets. |
+| `tracked` | One target emits `targetFound` | Looks up its `targetIndex`, swaps in that book’s cover and metadata, anchors the A-Frame card, and opens the HTML summary sheet. |
 | `lost` | Target emits `targetLost` | Hides the anchored card and briefly asks the user to move back to the cover. |
 | `error` | Preflight or MindAR emits an error | Gives a specific recovery message and a no-camera preview. |
 | `demo` | User selects the preview path | Simulates the discovered state without claiming that tracking occurred. |
@@ -41,19 +41,20 @@ The app does not call `getUserMedia()` separately. MindAR owns the single camera
 
 ## Recognition and presentation
 
-- `public/assets/i-robot-cover.jpg` is the approved, same-origin visual asset.
-- `public/assets/i-robot.mind` contains the precomputed feature points for that exact byte sequence.
-- `public/data/book.json` connects the record, ISBN, local paths, human-written summary, source URLs, hashes, and compilation time.
+- `public/data/books.json` assigns every book a stable ID and contiguous `targetIndex`.
+- `public/assets/banned-books.mind` contains all five covers in the exact order recorded by the manifest.
+- Each manifest entry connects its record, ISBN, local cover, summary, source URLs, review state, hashes, and compilation time.
+- Target 0 is the approved *I, Robot* cover. Targets 1–4 are explicit edition candidates until checked against the physical books.
 - The target-anchored scene displays a floating cover and short summary in 3D.
 - The DOM result sheet repeats the summary at normal reading size, remains keyboard accessible, and links to the original SJPL record.
 
 ## Add another book
 
-1. Create one manifest entry with a stable internal ID, the exact edition identifiers, a human-written display summary, and provenance.
+1. Create one manifest entry with a stable internal ID, the next contiguous target index, exact edition identifiers, a human-written display summary, and provenance.
 2. Acquire an approved straight-on cover, decode and visually compare it with the exhibition copy, then store it locally.
 3. Compile the image and append it to a multi-target `.mind` file. Record the resulting `targetIndex` beside the book entry.
-4. Replace the single `mindar-image-target` entity with one entity per index, or create them from the manifest before the scene starts.
-5. Route every entity’s `targetFound` and `targetLost` event through the same state controller with its book ID.
+4. Add one `mindar-image-target` anchor with the same index. The shared visual card is reparented to whichever anchor matches.
+5. Route every entity’s `targetFound` and `targetLost` event through the shared state controller.
 6. Test every physical cover for false positives and for robustness under realistic distance, angle, glare, and library stickers.
 
 For a larger catalog, keep editorial metadata in a build artifact or CMS export. Do not turn the phone client into a live catalog scraper.

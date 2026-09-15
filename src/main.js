@@ -3,7 +3,7 @@ import "./styles.css";
 const dom = {
   body: document.body,
   scene: document.querySelector("#ar-scene"),
-  target: document.querySelector("#book-target"),
+  targets: [...document.querySelectorAll(".book-target")],
   content: document.querySelector("#book-content"),
   statusLabel: document.querySelector("#status-label"),
   scanFooterCopy: document.querySelector("#scan-footer-copy"),
@@ -19,29 +19,48 @@ const dom = {
   resultTitle: document.querySelector("#result-title"),
   resultSummary: document.querySelector("#result-summary"),
   editionLabel: document.querySelector("#edition-label"),
+  coverStatus: document.querySelector("#cover-status"),
+  catalogLink: document.querySelector("#catalog-link"),
+  matchBadge: document.querySelector("#match-badge"),
+  introCover: document.querySelector("#intro-cover"),
+  demoCover: document.querySelector("#demo-cover"),
+  introIsbn: document.querySelector("#intro-isbn"),
+  introTargetLabel: document.querySelector("#intro-target-label"),
+  introTitle: document.querySelector("#intro-title"),
+  arCover: document.querySelector("#ar-cover"),
   arTitle: document.querySelector("#ar-title"),
   arKicker: document.querySelector("#ar-kicker"),
   arSummary: document.querySelector("#ar-summary"),
 };
 
-const phaseCopy = {
-  intro: ["READY", "LOOKING FOR TARGET 01"],
-  starting: ["STARTING", "OPENING CAMERA"],
-  scanning: ["SCANNING", "LOOKING FOR TARGET 01"],
-  tracked: ["MATCHED", "TARGET 01 LOCKED"],
-  lost: ["SEARCHING", "MOVE BACK TO THE COVER"],
-  demo: ["PREVIEW", "SIMULATED MATCH"],
-  error: ["OFFLINE", "CAMERA NOT STARTED"],
-};
-
 let phase = "intro";
 let arSystem = null;
+let books = [];
 let book = null;
+let activeTarget = null;
+
+function targetLabel(data = book) {
+  return `TARGET ${String((data?.targetIndex ?? 0) + 1).padStart(2, "0")}`;
+}
+
+function phaseCopy(nextPhase) {
+  const count = books.length || dom.targets.length;
+  const copy = {
+    intro: ["READY", `${count} COVER TARGETS`],
+    starting: ["STARTING", "OPENING CAMERA"],
+    scanning: ["SCANNING", `LOOKING FOR ${count} COVERS`],
+    tracked: ["MATCHED", `${targetLabel()} LOCKED`],
+    lost: ["SEARCHING", "MOVE BACK TO THE COVER"],
+    demo: ["PREVIEW", "SIMULATED MATCH"],
+    error: ["OFFLINE", "CAMERA NOT STARTED"],
+  };
+  return copy[nextPhase] ?? copy.intro;
+}
 
 function setPhase(nextPhase) {
   phase = nextPhase;
   dom.body.dataset.phase = nextPhase;
-  const [status, footer] = phaseCopy[nextPhase] ?? phaseCopy.intro;
+  const [status, footer] = phaseCopy(nextPhase);
   dom.statusLabel.textContent = status;
   dom.scanFooterCopy.textContent = footer;
 
@@ -62,15 +81,11 @@ function supportsWebGL() {
 
 function cameraPreflight() {
   const localHost = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
-  if (!window.isSecureContext && !localHost) {
-    return "Open this experience over HTTPS to use the camera.";
-  }
+  if (!window.isSecureContext && !localHost) return "Open this experience over HTTPS to use the camera.";
   if (!navigator.mediaDevices?.getUserMedia) {
     return "This browser does not expose camera access. Try current Safari or Chrome.";
   }
-  if (!supportsWebGL()) {
-    return "WebGL is unavailable, so image tracking cannot run in this browser.";
-  }
+  if (!supportsWebGL()) return "WebGL is unavailable, so image tracking cannot run in this browser.";
   return null;
 }
 
@@ -93,12 +108,8 @@ function readableCameraError(error) {
   if (error?.name === "NotAllowedError") {
     return "Camera permission was denied. Allow camera access in your browser settings, then try again.";
   }
-  if (error?.name === "NotFoundError") {
-    return "No camera was found on this device.";
-  }
-  if (error?.name === "NotReadableError") {
-    return "The camera is already in use by another app or tab.";
-  }
+  if (error?.name === "NotFoundError") return "No camera was found on this device.";
+  if (error?.name === "NotReadableError") return "The camera is already in use by another app or tab.";
   return error?.message || "The AR camera could not start on this device.";
 }
 
@@ -108,10 +119,13 @@ async function startCamera() {
     showError(preflightError);
     return;
   }
+  if (books.length !== dom.targets.length) {
+    showError("The book target manifest did not load. Refresh the page and try again.");
+    return;
+  }
 
   setPhase("starting");
   dom.startButton.disabled = true;
-
   try {
     await waitForScene();
     arSystem = dom.scene.systems["mindar-image-system"];
@@ -131,6 +145,8 @@ async function stopCamera() {
     // The browser may have already released the stream during page teardown.
   }
   dom.content.setAttribute("scale", "0.001 0.001 0.001");
+  activeTarget = null;
+  if (books[0]) applyBookData(books[0]);
   setPhase("intro");
 }
 
@@ -140,32 +156,64 @@ function showError(message) {
 }
 
 function openDemo() {
-  if (phase !== "intro" && phase !== "error") {
-    arSystem?.stop?.();
-  }
+  if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
+  if (books[0]) applyBookData(books[0]);
   setPhase("demo");
 }
 
 function applyBookData(data) {
   book = data;
-  const author = data.authors?.[0] ?? "Isaac Asimov";
+  const author = data.authors?.[0] ?? "Unknown author";
+  const isbn = data.isbn?.[0] ?? "EDITION PENDING";
+  const status = data.coverStatus === "approved" ? "APPROVED COVER" : "CANDIDATE COVER";
+  const number = targetLabel(data);
+  const coverSelector = `#cover-${data.id}`;
+  const coverAlt = `${data.edition} cover of ${data.title}`;
+  const catalogUrl = data.recordUrl || data.catalogSearchUrl;
+
   document.title = `${data.title} — Banned Books AR`;
   dom.resultTitle.textContent = data.title;
   dom.resultSummary.textContent = data.displaySummary;
   dom.editionLabel.textContent = data.edition;
-  dom.arTitle.setAttribute("value", data.title.toUpperCase());
-  dom.arKicker.setAttribute("value", `FOUND / ${data.edition.toUpperCase()}`);
-  dom.arSummary.setAttribute("value", data.arSummary);
+  dom.coverStatus.textContent = status;
+  dom.coverStatus.dataset.status = data.coverStatus;
+  dom.matchBadge.textContent = `MATCH ${number.slice(-2)}`;
+  dom.catalogLink.href = catalogUrl;
+  dom.catalogLink.firstChild.textContent = data.recordUrl ? "VIEW SJPL RECORD " : "SEARCH SJPL CATALOG ";
+
+  dom.introTitle.textContent = data.title;
+  dom.introIsbn.textContent = `ISBN ${isbn}`;
+  dom.introTargetLabel.textContent = `${number} / ${status}`;
+  dom.introCover.src = data.coverPath;
+  dom.introCover.alt = coverAlt;
+  dom.demoCover.src = data.coverPath;
+  dom.demoCover.alt = coverAlt;
   document.querySelector(".author").textContent = author;
+
+  dom.arCover.setAttribute("src", coverSelector);
+  dom.arTitle.setAttribute("value", data.title.toUpperCase());
+  dom.arKicker.setAttribute("value", `FOUND / ${status}`);
+  dom.arSummary.setAttribute("value", data.arSummary);
 }
 
 async function loadBookData() {
   try {
-    const response = await fetch("./data/book.json", { cache: "no-store" });
+    const response = await fetch("./data/books.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`Book data returned ${response.status}`);
-    applyBookData(await response.json());
+    const manifest = await response.json();
+    books = manifest.books.sort((left, right) => left.targetIndex - right.targetIndex);
+    if (books.length !== dom.targets.length) {
+      throw new Error(`Expected ${dom.targets.length} books but received ${books.length}.`);
+    }
+    books.forEach((entry, index) => {
+      if (entry.targetIndex !== index) throw new Error("Target indexes are not contiguous.");
+    });
+    applyBookData(books[0]);
+    setPhase("intro");
   } catch (error) {
-    console.warn("Using embedded book copy because metadata could not be loaded.", error);
+    console.warn("The multi-book manifest could not be loaded.", error);
+    dom.startButton.disabled = true;
+    showError("The book target manifest could not be loaded. Refresh after redeploying the app.");
   }
 }
 
@@ -174,19 +222,29 @@ dom.scene.addEventListener("arError", (event) => {
   showError(readableCameraError(event.detail?.error || event.detail));
 });
 
-dom.target.addEventListener("targetFound", () => {
-  dom.content.setAttribute("scale", "0.001 0.001 0.001");
-  dom.content.emit("reveal");
-  setPhase("tracked");
-});
+for (const target of dom.targets) {
+  target.addEventListener("targetFound", () => {
+    const targetIndex = Number(target.dataset.targetIndex);
+    const matchedBook = books[targetIndex];
+    if (!matchedBook) return;
+    activeTarget = target;
+    target.appendChild(dom.content);
+    applyBookData(matchedBook);
+    dom.content.setAttribute("scale", "0.001 0.001 0.001");
+    dom.content.emit("reveal");
+    setPhase("tracked");
+  });
 
-dom.target.addEventListener("targetLost", () => {
-  dom.content.setAttribute("scale", "0.001 0.001 0.001");
-  setPhase("lost");
-  window.setTimeout(() => {
-    if (phase === "lost") setPhase("scanning");
-  }, 1200);
-});
+  target.addEventListener("targetLost", () => {
+    if (target !== activeTarget) return;
+    dom.content.setAttribute("scale", "0.001 0.001 0.001");
+    activeTarget = null;
+    setPhase("lost");
+    window.setTimeout(() => {
+      if (phase === "lost") setPhase("scanning");
+    }, 1200);
+  });
+}
 
 dom.startButton.addEventListener("click", startCamera);
 dom.demoButton.addEventListener("click", openDemo);
@@ -197,7 +255,6 @@ dom.exitButton.addEventListener("click", stopCamera);
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && phase !== "intro") stopCamera();
 });
-
 window.addEventListener("pagehide", () => arSystem?.stop?.());
 
 loadBookData();

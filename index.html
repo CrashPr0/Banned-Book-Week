@@ -6,10 +6,10 @@
     <meta name="theme-color" content="#080808" />
     <meta
       name="description"
-      content="Scan the Bantam trade paperback cover of Isaac Asimov's I, Robot to reveal an augmented-reality book summary."
+      content="Scan one of five Banned Books Week covers to reveal an augmented-reality book summary."
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>I, Robot — Banned Books AR</title>
+    <title>Banned Books AR</title>
     <script defer src="./vendor/aframe-1.6.0.min.js"></script>
     <script defer src="./vendor/mindar-image-aframe-1.2.5.prod.js"></script>
   </head>
@@ -18,7 +18,7 @@
       <section class="ar-stage" aria-label="Book cover scanner">
         <a-scene
           id="ar-scene"
-          mindar-image="imageTargetSrc: ./assets/i-robot.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no;"
+          mindar-image="imageTargetSrc: ./assets/banned-books.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no;"
           color-space="sRGB"
           renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true; antialias: true;"
           vr-mode-ui="enabled: false"
@@ -26,12 +26,32 @@
           embedded
         >
           <a-assets timeout="12000">
-            <img id="cover-texture" src="./assets/i-robot-cover.jpg" alt="" />
+            <img id="cover-i-robot" src="./assets/i-robot-cover.jpg" alt="" />
+            <img
+              id="cover-huckleberry-finn"
+              src="./assets/covers/huckleberry-finn-9780143107323.jpg"
+              alt=""
+            />
+            <img
+              id="cover-merchant-of-venice"
+              src="./assets/covers/merchant-of-venice-9780810997172.jpg"
+              alt=""
+            />
+            <img
+              id="cover-this-earth-of-mankind"
+              src="./assets/covers/this-earth-of-mankind-9780140256352.jpg"
+              alt=""
+            />
+            <img
+              id="cover-all-quiet-western-front"
+              src="./assets/covers/all-quiet-western-front-9780449213940.jpg"
+              alt=""
+            />
           </a-assets>
 
           <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-          <a-entity id="book-target" mindar-image-target="targetIndex: 0">
+          <a-entity id="book-target" class="book-target" data-target-index="0" mindar-image-target="targetIndex: 0">
             <a-entity
               id="book-content"
               position="0 0 0"
@@ -51,7 +71,8 @@
                 material="shader: flat; color: #101010; opacity: 0.98"
               ></a-plane>
               <a-image
-                src="#cover-texture"
+                id="ar-cover"
+                src="#cover-i-robot"
                 position="-0.56 1.02 0.042"
                 width="0.42"
                 height="0.634"
@@ -89,6 +110,10 @@
               ></a-text>
             </a-entity>
           </a-entity>
+          <a-entity class="book-target" data-target-index="1" mindar-image-target="targetIndex: 1"></a-entity>
+          <a-entity class="book-target" data-target-index="2" mindar-image-target="targetIndex: 2"></a-entity>
+          <a-entity class="book-target" data-target-index="3" mindar-image-target="targetIndex: 3"></a-entity>
+          <a-entity class="book-target" data-target-index="4" mindar-image-target="targetIndex: 4"></a-entity>
         </a-scene>
 
         <div class="camera-shade" aria-hidden="true"></div>
@@ -118,18 +143,18 @@
 
         <div id="demo-card" class="demo-card" aria-hidden="true">
           <div class="demo-card__beam"></div>
-          <img src="./assets/i-robot-cover.jpg" alt="I, Robot cover" />
+          <img id="demo-cover" src="./assets/i-robot-cover.jpg" alt="I, Robot cover" />
         </div>
 
         <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">
           <div class="intro-panel__edition">
-            <span>VERTICAL SLICE</span>
-            <span>ISBN 9780553382563</span>
+            <span>5 COVER TARGETS</span>
+            <span id="intro-isbn">5 COVER TARGETS</span>
           </div>
           <div class="intro-panel__book">
-            <img src="./assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
+            <img id="intro-cover" src="./assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
             <div>
-              <p class="eyebrow">TARGET 01 / SCIENCE FICTION</p>
+              <p id="intro-target-label" class="eyebrow">TARGET 01 / APPROVED COVER</p>
               <h1 id="intro-title">I, Robot</h1>
               <p class="author">Isaac Asimov</p>
               <p class="instruction">Place the entire front cover inside the frame. Keep it flat and avoid glare.</p>
@@ -150,14 +175,15 @@
               <p class="eyebrow">COVER RECOGNIZED</p>
               <h2 id="result-title">I, Robot</h2>
             </div>
-            <span class="match-badge">MATCH 01</span>
+            <span id="match-badge" class="match-badge">MATCH 01</span>
           </div>
           <p id="result-summary" class="result-panel__summary"></p>
           <div class="result-panel__meta">
             <span id="edition-label">Bantam trade pbk. ed.</span>
-            <span>1950 / STORIES</span>
+            <span id="cover-status">APPROVED COVER</span>
           </div>
           <a
+            id="catalog-link"
             class="catalog-link"
             href="https://sjpl.bibliocommons.com/v2/record/S156C6635382"
             target="_blank"

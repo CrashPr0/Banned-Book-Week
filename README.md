@@ -1,8 +1,8 @@
 # Banned Books AR
 
-A mobile-first MindAR vertical slice for five book-cover targets. Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
+A mobile-first QR scanner for five Banned Books Week titles. Point the camera at a sticker QR code and the app selects the matching title, then shows a floating cover card plus an accessible HTML summary panel.
 
-The current target pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus four edition candidates: *Adventures of Huckleberry Finn*, *The Merchant of Venice*, *This Earth of Mankind*, and *All Quiet on the Western Front*. Candidate covers must be compared with the physical installation copies before they are marked approved.
+The current pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus four edition candidates: *Adventures of Huckleberry Finn*, *The Merchant of Venice*, *This Earth of Mankind*, and *All Quiet on the Western Front*. Cover artwork is display-only; recognition uses printed QR payloads (`bbw:` + book id), not jacket images.
 
 Deployments:
 
@@ -13,11 +13,14 @@ Deployments:
 
 ```bash
 npm install
-npm run check:target
+npm run generate:qrcodes
+npm run check:qrcodes
 npm run dev
 ```
 
-Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. “Preview without a camera” exercises the result state without camera access.
+Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. “Preview without a camera” exercises the result state without camera access. Deep-link a title with `?book=i-robot`.
+
+Printable sticker sheet: open `/print-qrcodes.html` after generating codes.
 
 ```bash
 npm run build
@@ -29,17 +32,16 @@ The static production build is written to `dist/`.
 
 The app never contacts a catalog, publisher, or cover service at runtime. It reads only same-origin files from `public/data/` and `public/assets/`.
 
-`npm run scrape` refreshes the pinned image from Penguin Random House’s documented ISBN cover endpoint. The script allowlists the host, limits response size and time, validates JPEG bytes, hashes the result, and marks the MindAR target stale whenever the cover changes. A changed cover must be visually matched to the physical book before recompiling.
+`npm run scrape` refreshes the pinned *I, Robot* display image from Penguin Random House’s documented ISBN cover endpoint. The script allowlists the host, limits response size and time, validates JPEG bytes, and hashes the result. Display covers no longer need MindAR recompilation.
 
 To refresh the four candidate-edition files and generate `public/data/books.json`:
 
 ```bash
 npm run setup:candidates
+npm run generate:qrcodes
 ```
 
-This command deliberately marks every refreshed candidate as unreviewed. Recompile after running it.
-
-When refreshing *I, Robot*, run `npm run scrape`, then `npm run setup:candidates`, review the covers, and finally recompile the combined target pack.
+Then print or reprint the QR sticker sheet.
 
 To refresh metadata from a catalog page saved manually as HTML:
 
@@ -55,21 +57,22 @@ npm run scrape -- --live-sjpl --authorized
 
 Use that option only after the project owner has documented permission. It fetches one anonymous record; do not schedule or batch it.
 
-## Recompile the recognition target
+## Regenerate QR targets
 
-After an approved or candidate cover changes:
+After adding or renaming a book id:
 
 ```bash
-npm run compile:target
+npm run generate:qrcodes
+npm run check:qrcodes
 ```
 
-Open the printed loopback URL once. The page runs MindAR 1.2.5’s compiler in the browser, compiles the five images in target-index order, writes `public/assets/banned-books.mind`, records each exact cover SHA-256 in the manifest, and shuts its local server down. Then run `npm run check:target`.
+Each book gets a PNG under `public/assets/qrcodes/` whose payload is `bbw:` plus the book id. The scanner also accepts deep-link URLs that include `?book=` plus the id.
 
 See [docs/AR_LOGIC.md](docs/AR_LOGIC.md) for the state machine, data flow, and the path to more books.
 
 ## Production checks
 
-- Test the actual library copy, not only an image on a second screen. Jackets, stickers, glare, and reprints can change recognition.
+- Print high-contrast QR stickers; keep them flat, glare-free, and large enough for handheld scanning.
 - Confirm cover reproduction rights before public launch. The repository records provenance, not a license grant.
-- Keep A-Frame, MindAR, the cover, and `.mind` target pinned. Update them deliberately and re-test iOS Safari and Android Chrome.
+- Keep Vite, jsQR, and the QR encoder pinned. Update them deliberately and re-test iOS Safari and Android Chrome.
 - Camera video is processed in the browser and is not uploaded by this app.

@@ -1,10 +1,10 @@
 import "./styles.css";
+import jsQR from "jsqr";
 
 const dom = {
   body: document.body,
-  scene: document.querySelector("#ar-scene"),
-  targets: [...document.querySelectorAll(".book-target")],
-  content: document.querySelector("#book-content"),
+  video: document.querySelector("#camera-video"),
+  canvas: document.querySelector("#scan-canvas"),
   statusLabel: document.querySelector("#status-label"),
   scanFooterCopy: document.querySelector("#scan-footer-copy"),
   introPanel: document.querySelector("#intro-panel"),
@@ -25,32 +25,35 @@ const dom = {
   introCover: document.querySelector("#intro-cover"),
   demoCover: document.querySelector("#demo-cover"),
   introIsbn: document.querySelector("#intro-isbn"),
+  introCount: document.querySelector("#intro-count"),
   introTargetLabel: document.querySelector("#intro-target-label"),
   introTitle: document.querySelector("#intro-title"),
-  arCover: document.querySelector("#ar-cover"),
-  arTitle: document.querySelector("#ar-title"),
-  arKicker: document.querySelector("#ar-kicker"),
-  arSummary: document.querySelector("#ar-summary"),
 };
 
+const canvasContext = dom.canvas.getContext("2d", { willReadFrequently: true });
+
 let phase = "intro";
-let arSystem = null;
 let books = [];
+let bookById = new Map();
 let book = null;
-let activeTarget = null;
+let mediaStream = null;
+let scanFrame = 0;
+let lastMatchAt = 0;
+let lostTimer = 0;
+let barcodeDetector = null;
 
 function targetLabel(data = book) {
   return `TARGET ${String((data?.targetIndex ?? 0) + 1).padStart(2, "0")}`;
 }
 
 function phaseCopy(nextPhase) {
-  const count = books.length || dom.targets.length;
+  const count = books.length || 5;
   const copy = {
-    intro: ["READY", `${count} COVER TARGETS`],
+    intro: ["READY", `${count} QR TARGETS`],
     starting: ["STARTING", "OPENING CAMERA"],
-    scanning: ["SCANNING", `LOOKING FOR ${count} COVERS`],
+    scanning: ["SCANNING", `LOOKING FOR ${count} QR CODES`],
     tracked: ["MATCHED", `${targetLabel()} LOCKED`],
-    lost: ["SEARCHING", "MOVE BACK TO THE COVER"],
+    lost: ["SEARCHING", "MOVE BACK TO THE QR CODE"],
     demo: ["PREVIEW", "SIMULATED MATCH"],
     error: ["OFFLINE", "CAMERA NOT STARTED"],
   };
@@ -65,18 +68,11 @@ function setPhase(nextPhase) {
   dom.scanFooterCopy.textContent = footer;
 
   const resultVisible = nextPhase === "tracked" || nextPhase === "demo";
+  const cameraLive = ["starting", "scanning", "tracked", "lost"].includes(nextPhase);
   dom.resultPanel.setAttribute("aria-hidden", String(!resultVisible));
   dom.errorPanel.setAttribute("aria-hidden", String(nextPhase !== "error"));
   dom.introPanel.setAttribute("aria-hidden", String(nextPhase !== "intro"));
-}
-
-function supportsWebGL() {
-  try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
+  dom.video.setAttribute("aria-hidden", String(!cameraLive));
 }
 
 function cameraPreflight() {
@@ -85,23 +81,7 @@ function cameraPreflight() {
   if (!navigator.mediaDevices?.getUserMedia) {
     return "This browser does not expose camera access. Try current Safari or Chrome.";
   }
-  if (!supportsWebGL()) return "WebGL is unavailable, so image tracking cannot run in this browser.";
   return null;
-}
-
-function waitForScene() {
-  if (dom.scene.hasLoaded) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new Error("AR scene timed out while loading.")), 12000);
-    dom.scene.addEventListener(
-      "loaded",
-      () => {
-        window.clearTimeout(timer);
-        resolve();
-      },
-      { once: true },
-    );
-  });
 }
 
 function readableCameraError(error) {
@@ -110,54 +90,73 @@ function readableCameraError(error) {
   }
   if (error?.name === "NotFoundError") return "No camera was found on this device.";
   if (error?.name === "NotReadableError") return "The camera is already in use by another app or tab.";
-  return error?.message || "The AR camera could not start on this device.";
+  return error?.message || "The camera could not start on this device.";
 }
 
-async function startCamera() {
-  const preflightError = cameraPreflight();
-  if (preflightError) {
-    showError(preflightError);
-    return;
-  }
-  if (books.length !== dom.targets.length) {
-    showError("The book target manifest did not load. Refresh the page and try again.");
-    return;
+function resolveBookFromPayload(raw) {
+  if (!raw) return null;
+  const value = String(raw).trim();
+  const direct = /^bbw:([a-z0-9-]+)$/i.exec(value);
+  if (direct) return bookById.get(direct[1].toLowerCase()) ?? null;
+
+  try {
+    const url = new URL(value, location.href);
+    const fromQuery = url.searchParams.get("book");
+    if (fromQuery && bookById.has(fromQuery)) return bookById.get(fromQuery);
+    const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+    const fromHash = hashParams.get("book");
+    if (fromHash && bookById.has(fromHash)) return bookById.get(fromHash);
+  } catch {
+    // Not a URL payload.
   }
 
-  setPhase("starting");
-  dom.startButton.disabled = true;
+  if (bookById.has(value)) return bookById.get(value);
+  return null;
+}
+
+async function createBarcodeDetector() {
+  if (!("BarcodeDetector" in window)) return null;
   try {
-    await waitForScene();
-    arSystem = dom.scene.systems["mindar-image-system"];
-    if (!arSystem?.start) throw new Error("The image-tracking engine did not load.");
-    await arSystem.start();
-  } catch (error) {
-    showError(readableCameraError(error));
-  } finally {
-    dom.startButton.disabled = false;
+    const formats = await window.BarcodeDetector.getSupportedFormats();
+    if (!formats.includes("qr_code")) return null;
+    return new window.BarcodeDetector({ formats: ["qr_code"] });
+  } catch {
+    return null;
   }
+}
+
+function stopScanLoop() {
+  if (scanFrame) {
+    cancelAnimationFrame(scanFrame);
+    scanFrame = 0;
+  }
+}
+
+function stopCameraTracks() {
+  mediaStream?.getTracks().forEach((track) => track.stop());
+  mediaStream = null;
+  dom.video.srcObject = null;
 }
 
 async function stopCamera() {
-  try {
-    await arSystem?.stop?.();
-  } catch {
-    // The browser may have already released the stream during page teardown.
-  }
-  dom.content.setAttribute("scale", "0.001 0.001 0.001");
-  activeTarget = null;
+  stopScanLoop();
+  window.clearTimeout(lostTimer);
+  stopCameraTracks();
   if (books[0]) applyBookData(books[0]);
   setPhase("intro");
 }
 
 function showError(message) {
+  stopScanLoop();
+  stopCameraTracks();
   dom.errorMessage.textContent = message;
   setPhase("error");
 }
 
-function openDemo() {
-  if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
-  if (books[0]) applyBookData(books[0]);
+function openDemo(matchedBook = books[0]) {
+  stopScanLoop();
+  stopCameraTracks();
+  if (matchedBook) applyBookData(matchedBook);
   setPhase("demo");
 }
 
@@ -167,7 +166,6 @@ function applyBookData(data) {
   const isbn = data.isbn?.[0] ?? "EDITION PENDING";
   const status = data.coverStatus === "approved" ? "APPROVED COVER" : "CANDIDATE COVER";
   const number = targetLabel(data);
-  const coverSelector = `#cover-${data.id}`;
   const coverAlt = `${data.edition} cover of ${data.title}`;
   const catalogUrl = data.recordUrl || data.catalogSearchUrl;
 
@@ -182,18 +180,120 @@ function applyBookData(data) {
   dom.catalogLink.firstChild.textContent = data.recordUrl ? "VIEW SJPL RECORD " : "SEARCH SJPL CATALOG ";
 
   dom.introTitle.textContent = data.title;
-  dom.introIsbn.textContent = `ISBN ${isbn}`;
-  dom.introTargetLabel.textContent = `${number} / ${status}`;
+  dom.introIsbn.textContent = data.qrPayload ?? `ISBN ${isbn}`;
+  dom.introCount.textContent = `${books.length || 5} QR TARGETS`;
+  dom.introTargetLabel.textContent = `${number} / QR ${data.qrPayload ?? data.id}`;
   dom.introCover.src = data.coverPath;
   dom.introCover.alt = coverAlt;
   dom.demoCover.src = data.coverPath;
   dom.demoCover.alt = coverAlt;
   document.querySelector(".author").textContent = author;
+}
 
-  dom.arCover.setAttribute("src", coverSelector);
-  dom.arTitle.setAttribute("value", data.title.toUpperCase());
-  dom.arKicker.setAttribute("value", `FOUND / ${status}`);
-  dom.arSummary.setAttribute("value", data.arSummary);
+function handleMatch(matchedBook) {
+  lastMatchAt = performance.now();
+  window.clearTimeout(lostTimer);
+  if (book?.id !== matchedBook.id || phase !== "tracked") {
+    applyBookData(matchedBook);
+  }
+  if (phase !== "tracked") setPhase("tracked");
+}
+
+function handleMiss() {
+  if (phase !== "tracked") return;
+  if (performance.now() - lastMatchAt < 900) return;
+  window.clearTimeout(lostTimer);
+  setPhase("lost");
+  lostTimer = window.setTimeout(() => {
+    if (phase === "lost") setPhase("scanning");
+  }, 1200);
+}
+
+async function detectWithBarcodeDetector() {
+  const codes = await barcodeDetector.detect(dom.video);
+  for (const code of codes) {
+    const matched = resolveBookFromPayload(code.rawValue);
+    if (matched) return matched;
+  }
+  return null;
+}
+
+function detectWithJsQR() {
+  const width = dom.video.videoWidth;
+  const height = dom.video.videoHeight;
+  if (!width || !height) return null;
+
+  const sample = Math.min(width, height, 720);
+  const sx = Math.floor((width - sample) / 2);
+  const sy = Math.floor((height - sample) / 2);
+  dom.canvas.width = sample;
+  dom.canvas.height = sample;
+  canvasContext.drawImage(dom.video, sx, sy, sample, sample, 0, 0, sample, sample);
+  const imageData = canvasContext.getImageData(0, 0, sample, sample);
+  const code = jsQR(imageData.data, sample, sample, { inversionAttempts: "dontInvert" });
+  return resolveBookFromPayload(code?.data);
+}
+
+async function scanLoop() {
+  if (!mediaStream || phase === "intro" || phase === "error" || phase === "demo") return;
+
+  try {
+    if (dom.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      const matched = barcodeDetector ? await detectWithBarcodeDetector() : detectWithJsQR();
+      if (matched) handleMatch(matched);
+      else handleMiss();
+    }
+  } catch (error) {
+    console.warn("QR detection frame failed.", error);
+  }
+
+  scanFrame = requestAnimationFrame(scanLoop);
+}
+
+async function startCamera() {
+  const preflightError = cameraPreflight();
+  if (preflightError) {
+    showError(preflightError);
+    return;
+  }
+  if (!books.length) {
+    showError("The book QR manifest did not load. Refresh the page and try again.");
+    return;
+  }
+
+  setPhase("starting");
+  dom.startButton.disabled = true;
+  try {
+    stopScanLoop();
+    stopCameraTracks();
+    barcodeDetector = await createBarcodeDetector();
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+    });
+    dom.video.srcObject = mediaStream;
+    await dom.video.play();
+    setPhase("scanning");
+    scanFrame = requestAnimationFrame(scanLoop);
+  } catch (error) {
+    showError(readableCameraError(error));
+  } finally {
+    dom.startButton.disabled = false;
+  }
+}
+
+function bookFromLocation() {
+  const params = new URLSearchParams(location.search);
+  const fromQuery = params.get("book");
+  if (fromQuery && bookById.has(fromQuery)) return bookById.get(fromQuery);
+  const hashParams = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const fromHash = hashParams.get("book");
+  if (fromHash && bookById.has(fromHash)) return bookById.get(fromHash);
+  return null;
 }
 
 async function loadBookData() {
@@ -202,59 +302,34 @@ async function loadBookData() {
     if (!response.ok) throw new Error(`Book data returned ${response.status}`);
     const manifest = await response.json();
     books = manifest.books.sort((left, right) => left.targetIndex - right.targetIndex);
-    if (books.length !== dom.targets.length) {
-      throw new Error(`Expected ${dom.targets.length} books but received ${books.length}.`);
-    }
     books.forEach((entry, index) => {
       if (entry.targetIndex !== index) throw new Error("Target indexes are not contiguous.");
+      if (!entry.qrPayload) throw new Error(`${entry.title} is missing a QR payload.`);
     });
-    applyBookData(books[0]);
-    setPhase("intro");
+    bookById = new Map(books.map((entry) => [entry.id, entry]));
+    const deepLinked = bookFromLocation();
+    applyBookData(deepLinked ?? books[0]);
+    if (deepLinked) setPhase("demo");
+    else setPhase("intro");
   } catch (error) {
     console.warn("The multi-book manifest could not be loaded.", error);
     dom.startButton.disabled = true;
-    showError("The book target manifest could not be loaded. Refresh after redeploying the app.");
+    showError("The book QR manifest could not be loaded. Refresh after regenerating QR codes.");
   }
 }
 
-dom.scene.addEventListener("arReady", () => setPhase("scanning"));
-dom.scene.addEventListener("arError", (event) => {
-  showError(readableCameraError(event.detail?.error || event.detail));
-});
-
-for (const target of dom.targets) {
-  target.addEventListener("targetFound", () => {
-    const targetIndex = Number(target.dataset.targetIndex);
-    const matchedBook = books[targetIndex];
-    if (!matchedBook) return;
-    activeTarget = target;
-    target.appendChild(dom.content);
-    applyBookData(matchedBook);
-    dom.content.setAttribute("scale", "0.001 0.001 0.001");
-    dom.content.emit("reveal");
-    setPhase("tracked");
-  });
-
-  target.addEventListener("targetLost", () => {
-    if (target !== activeTarget) return;
-    dom.content.setAttribute("scale", "0.001 0.001 0.001");
-    activeTarget = null;
-    setPhase("lost");
-    window.setTimeout(() => {
-      if (phase === "lost") setPhase("scanning");
-    }, 1200);
-  });
-}
-
 dom.startButton.addEventListener("click", startCamera);
-dom.demoButton.addEventListener("click", openDemo);
+dom.demoButton.addEventListener("click", () => openDemo(books[0]));
 dom.retryButton.addEventListener("click", startCamera);
-dom.fallbackButton.addEventListener("click", openDemo);
+dom.fallbackButton.addEventListener("click", () => openDemo(books[0]));
 dom.exitButton.addEventListener("click", stopCamera);
 
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && phase !== "intro") stopCamera();
 });
-window.addEventListener("pagehide", () => arSystem?.stop?.());
+window.addEventListener("pagehide", () => {
+  stopScanLoop();
+  stopCameraTracks();
+});
 
 loadBookData();

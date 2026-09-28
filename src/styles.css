@@ -68,26 +68,31 @@ button {
   mask-image: linear-gradient(to bottom, black, transparent 82%);
 }
 
-a-scene {
-  position: absolute !important;
+.camera-video {
+  position: absolute;
   z-index: 0;
   inset: 0;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0;
+  background: #050505;
   transition: opacity 280ms ease;
 }
 
-body[data-phase="starting"] a-scene,
-body[data-phase="scanning"] a-scene,
-body[data-phase="tracked"] a-scene,
-body[data-phase="lost"] a-scene {
+body[data-phase="starting"] .camera-video,
+body[data-phase="scanning"] .camera-video,
+body[data-phase="tracked"] .camera-video,
+body[data-phase="lost"] .camera-video {
   opacity: 1;
 }
 
-.a-canvas {
-  width: 100% !important;
-  height: 100% !important;
+.scan-canvas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .camera-shade {
@@ -197,8 +202,8 @@ body:not([data-phase="intro"]) .icon-button {
   z-index: 3;
   top: 49%;
   left: 50%;
-  width: min(64vw, 310px);
-  aspect-ratio: 299 / 450;
+  width: min(58vw, 280px);
+  aspect-ratio: 1;
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.96);
   transition: opacity 280ms ease, transform 280ms ease;
@@ -570,7 +575,8 @@ body[data-phase="lost"] .scan-footer {
   filter: drop-shadow(0 32px 28px rgba(0, 0, 0, 0.6));
 }
 
-body[data-phase="demo"] .demo-card {
+body[data-phase="demo"] .demo-card,
+body[data-phase="tracked"] .demo-card {
   display: block;
   animation: hover 2.5s ease-in-out infinite alternate;
 }
@@ -660,7 +666,7 @@ body[data-phase="demo"] .demo-card {
   }
 
   .scan-guide {
-    width: min(32vw, 330px);
+    width: min(28vw, 280px);
   }
 }
 

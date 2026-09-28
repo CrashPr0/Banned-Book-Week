@@ -8,10 +8,15 @@
     "build": "vite build",
     "scrape": "node scripts/scrape-book.mjs",
     "setup:candidates": "node scripts/setup-candidate-books.mjs",
-    "compile:target": "node scripts/compile-target-server.mjs",
-    "check:target": "node scripts/check-target-freshness.mjs"
+    "generate:qrcodes": "node scripts/generate-qrcodes.mjs",
+    "check:target": "node scripts/check-qr-freshness.mjs",
+    "check:qrcodes": "node scripts/check-qr-freshness.mjs"
   },
   "devDependencies": {
+    "qrcode": "^1.5.4",
     "vite": "8.3.0"
+  },
+  "dependencies": {
+    "jsqr": "^1.4.0"
   }
 }

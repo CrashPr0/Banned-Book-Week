@@ -3,12 +3,12 @@
     "type": "photographed installation plan",
     "file": "Image_20260915_112452_784.jpeg",
     "transcribedAt": "2026-09-15",
-    "note": "Titles and placements are transcribed from the photo. Call numbers and exact physical editions must be confirmed on site before AR target compilation."
+    "note": "Titles and placements are transcribed from the photo. Call numbers and exact physical editions must be confirmed on site before QR stickers are printed."
   },
   "workflow": {
     "catalog": "Use the catalogSearchUrl to select the record for the physical copy.",
-    "cover": "Record the ISBN and compare the downloaded cover with a straight-on photo of the physical cover.",
-    "target": "Compile the approved cover into the multi-target .mind file only after visual confirmation."
+    "cover": "Record the ISBN and store a display cover for the result UI; compare with the physical copy when possible.",
+    "target": "Assign a stable book id, run npm run generate:qrcodes, and print the sticker from /print-qrcodes.html."
   },
   "books": [
     {

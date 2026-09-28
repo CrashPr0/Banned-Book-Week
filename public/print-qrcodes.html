@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Banned Books AR — Printable QR codes</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: #070707;
+        background: #f4f0e7;
+      }
+
+      header {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 28px 20px 8px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        letter-spacing: -0.04em;
+      }
+
+      p {
+        margin: 0;
+        color: #4d4a45;
+        line-height: 1.45;
+      }
+
+      .sheet {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .card {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid #d7d2c8;
+        background: #fff;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .card img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      .card strong {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+      }
+
+      .meta {
+        color: #6a6660;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      @media print {
+        header {
+          padding-bottom: 0;
+        }
+
+        .sheet {
+          gap: 12px;
+          padding: 8px 0;
+        }
+
+        .card {
+          border-color: #111;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Banned Books AR QR stickers</h1>
+      <p>
+        Print these codes and place one on or beside each exhibition copy. The scanner looks for the
+        payload <code>bbw:&lt;book-id&gt;</code>, not the cover art.
+      </p>
+    </header>
+    <div id="sheet" class="sheet"></div>
+    <script type="module">
+      const sheet = document.querySelector("#sheet");
+      const manifest = await fetch("./data/books.json", { cache: "no-store" }).then((r) => r.json());
+      const books = [...manifest.books].sort((a, b) => a.targetIndex - b.targetIndex);
+      sheet.innerHTML = books
+        .map(
+          (book) => `
+          <article class="card">
+            <img src="${book.qrPath}" alt="QR code for ${book.title}" />
+            <div>
+              <div class="meta">TARGET ${String(book.targetIndex + 1).padStart(2, "0")} · ${book.qrPayload}</div>
+              <strong>${book.title}</strong>
+              <div class="meta">${book.authors?.[0] ?? ""}</div>
+            </div>
+          </article>
+        `,
+        )
+        .join("");
+    </script>
+  </body>
+</html>

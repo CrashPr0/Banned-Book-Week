@@ -1,7 +1,6 @@
 {
-  "version": 1,
-  "targetPath": "./assets/banned-books.mind",
-  "generatedAt": "2026-09-15T20:37:18.173Z",
+  "version": 2,
+  "generatedAt": "2026-09-28T19:56:25.797Z",
   "books": [
     {
       "recordId": "S156C6635382",
@@ -20,7 +19,6 @@
       "coverUrl": "https://images.penguinrandomhouse.com/cover/9780553382563",
       "catalogCoverUrl": "https://www.syndetics.com/index.aspx?isbn=9780553382563&issn=/LC.JPG&client=sanjosepl&type=xw12&oclc=53839993",
       "coverPath": "./assets/i-robot-cover.jpg",
-      "targetPath": "./assets/banned-books.mind",
       "displaySummary": "Nine linked stories follow the rise of intelligent robots and the people who build, test, fear, and depend on them. Asimov uses the Three Laws of Robotics to explore responsibility, power, and the uneasy line between human judgment and machine logic.",
       "arSummary": "Nine linked stories trace humanity's uneasy partnership with intelligent machines—and the loopholes hidden inside the Three Laws of Robotics.",
       "sourceDescription": "This classic science fiction masterwork weaves stories about robots, humanity, and the deep questions of existence into a novel of shocking intelligence and heart.",
@@ -30,17 +28,18 @@
         "cover": "Penguin Random House ISBN cover endpoint; requires visual approval for the physical copy",
         "coverSha256": "b801555f767fde3c4128740efac401f97604360eabf9809f4710664516d63570",
         "coverReviewRequired": false,
-        "targetCoverSha256": "b801555f767fde3c4128740efac401f97604360eabf9809f4710664516d63570",
-        "targetCompiledAt": "2026-09-15T20:41:48.791Z",
-        "targetStale": false,
-        "targetCompiler": "MindAR 1.2.5",
-        "physicalEditionReviewed": true
+        "physicalEditionReviewed": true,
+        "qrSha256": "8cee14262c81d5191679966fe02a4e35e4bf022cda6b9e5ab69fd9606e431444",
+        "qrGeneratedAt": "2026-09-28T19:56:25.797Z",
+        "qrEncoder": "qrcode (npm)"
       },
       "id": "i-robot",
       "targetIndex": 0,
       "coverStatus": "approved",
       "catalogSearchUrl": "https://sjpl.bibliocommons.com/v2/record/S156C6635382",
-      "challengeNote": "Frequently challenged in discussions about science fiction, technology, and the boundaries of human agency."
+      "challengeNote": "Frequently challenged in discussions about science fiction, technology, and the boundaries of human agency.",
+      "qrPayload": "bbw:i-robot",
+      "qrPath": "./assets/qrcodes/i-robot.png"
     },
     {
       "id": "huckleberry-finn",
@@ -62,17 +61,18 @@
       "displaySummary": "Huck Finn escapes an abusive home and travels the Mississippi with Jim, who is fleeing slavery. Their journey exposes the violence, fraud, prejudice, and moral compromises beneath the promise of freedom.",
       "arSummary": "Huck and Jim travel the Mississippi in search of freedom, confronting the cruelty and hypocrisy of the society around them.",
       "challengeNote": "Frequently challenged over racist language and racial representation, with debate about historical context and classroom use.",
-      "targetPath": "./assets/banned-books.mind",
       "coverStatus": "candidate",
       "provenance": {
         "metadata": "Curated from SJPL catalog discovery and publisher/Open Library edition data",
         "cover": "ia800100.us.archive.org ISBN cover endpoint",
         "coverSha256": "41d1450a55e1557092f7716e68ff62ed26abd08bb5c48ab460a32021816a5d68",
         "physicalEditionReviewed": false,
-        "targetCoverSha256": "41d1450a55e1557092f7716e68ff62ed26abd08bb5c48ab460a32021816a5d68",
-        "targetCompiledAt": "2026-09-15T20:41:48.791Z",
-        "targetCompiler": "MindAR 1.2.5"
-      }
+        "qrSha256": "c51c560608074175d947cc8063ea39046fdf461af5b96550dc880859810c6cd0",
+        "qrGeneratedAt": "2026-09-28T19:56:25.797Z",
+        "qrEncoder": "qrcode (npm)"
+      },
+      "qrPayload": "bbw:huckleberry-finn",
+      "qrPath": "./assets/qrcodes/huckleberry-finn.png"
     },
     {
       "id": "merchant-of-venice",
@@ -96,17 +96,18 @@
       "displaySummary": "A loan made for love turns into a demand for a pound of flesh. This manga adaptation stages Shakespeare's collision of debt, prejudice, revenge, and mercy in sixteenth-century Venice.",
       "arSummary": "A dangerous loan brings love, law, prejudice, revenge, and mercy into conflict in sixteenth-century Venice.",
       "challengeNote": "Often debated or challenged because of antisemitic characterization and questions about how the play should be taught.",
-      "targetPath": "./assets/banned-books.mind",
       "coverStatus": "candidate",
       "provenance": {
         "metadata": "Curated from SJPL catalog discovery and publisher/Open Library edition data",
         "cover": "ia600100.us.archive.org ISBN cover endpoint",
         "coverSha256": "ebaf6b7d3bc70529048c8061b2d6ed100cf46678bf39e7b7cea7052f6a94d2d0",
         "physicalEditionReviewed": false,
-        "targetCoverSha256": "ebaf6b7d3bc70529048c8061b2d6ed100cf46678bf39e7b7cea7052f6a94d2d0",
-        "targetCompiledAt": "2026-09-15T20:41:48.791Z",
-        "targetCompiler": "MindAR 1.2.5"
-      }
+        "qrSha256": "cda9c89295ed1fca539142628d809928c67f44d567254113dbce79a6c948434d",
+        "qrGeneratedAt": "2026-09-28T19:56:25.797Z",
+        "qrEncoder": "qrcode (npm)"
+      },
+      "qrPayload": "bbw:merchant-of-venice",
+      "qrPath": "./assets/qrcodes/merchant-of-venice.png"
     },
     {
       "id": "this-earth-of-mankind",
@@ -128,17 +129,18 @@
       "displaySummary": "In colonial Java, gifted student Minke moves between European schooling and an Indonesian society constrained by race and class. Love and injustice push him toward a new political consciousness.",
       "arSummary": "In colonial Java, Minke's education and forbidden love awaken him to the racial hierarchy and injustice surrounding him.",
       "challengeNote": "The novel was suppressed by Indonesia's New Order government along with other works by Pramoedya.",
-      "targetPath": "./assets/banned-books.mind",
       "coverStatus": "candidate",
       "provenance": {
         "metadata": "Curated from SJPL catalog discovery and publisher/Open Library edition data",
         "cover": "images.penguinrandomhouse.com ISBN cover endpoint",
         "coverSha256": "29a5cbf4dcb4bb6a876cbd0b93da696c80c250a6ec71b0a2a48b4ccfa8dc96ad",
         "physicalEditionReviewed": false,
-        "targetCoverSha256": "29a5cbf4dcb4bb6a876cbd0b93da696c80c250a6ec71b0a2a48b4ccfa8dc96ad",
-        "targetCompiledAt": "2026-09-15T20:41:48.791Z",
-        "targetCompiler": "MindAR 1.2.5"
-      }
+        "qrSha256": "d472f2a8772446d30a41cc4e6b87d3da4517f8e1d3594b98e8c60e860dc850b3",
+        "qrGeneratedAt": "2026-09-28T19:56:25.797Z",
+        "qrEncoder": "qrcode (npm)"
+      },
+      "qrPayload": "bbw:this-earth-of-mankind",
+      "qrPath": "./assets/qrcodes/this-earth-of-mankind.png"
     },
     {
       "id": "all-quiet-western-front",
@@ -160,17 +162,19 @@
       "displaySummary": "Paul Bäumer and his classmates enlist in the German army during World War I. Trench warfare strips away their patriotic ideals and leaves them struggling to preserve their humanity.",
       "arSummary": "Young German soldiers enter World War I with patriotic ideals and confront the devastating reality of trench warfare.",
       "challengeNote": "Banned and burned in Nazi Germany for its unromantic, antiwar portrayal of German soldiers' experience.",
-      "targetPath": "./assets/banned-books.mind",
       "coverStatus": "candidate",
       "provenance": {
         "metadata": "Curated from SJPL catalog discovery and publisher/Open Library edition data",
         "cover": "images.penguinrandomhouse.com ISBN cover endpoint",
         "coverSha256": "3be7d10c3691d73607773f507524bc9d0afdb12afdd9b11b93b96492c4cd4040",
         "physicalEditionReviewed": false,
-        "targetCoverSha256": "3be7d10c3691d73607773f507524bc9d0afdb12afdd9b11b93b96492c4cd4040",
-        "targetCompiledAt": "2026-09-15T20:41:48.791Z",
-        "targetCompiler": "MindAR 1.2.5"
-      }
+        "qrSha256": "a5c48d17bf0902ec1ef15bb6a97214fa0251fc85fa191922f3e07c03000a8330",
+        "qrGeneratedAt": "2026-09-28T19:56:25.797Z",
+        "qrEncoder": "qrcode (npm)"
+      },
+      "qrPayload": "bbw:all-quiet-western-front",
+      "qrPath": "./assets/qrcodes/all-quiet-western-front.png"
     }
-  ]
+  ],
+  "qrGeneratedAt": "2026-09-28T19:56:25.797Z"
 }

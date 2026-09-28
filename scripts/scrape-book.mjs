@@ -169,7 +169,6 @@ async function main() {
   const coverHash = sha256(cover.bytes);
   const previousHash = current.provenance?.coverSha256 ?? null;
   const coverChanged = Boolean(previousHash && previousHash !== coverHash);
-  const targetIsStale = Boolean(metadata.provenance?.targetCoverSha256 !== coverHash);
 
   const next = {
     ...metadata,
@@ -177,7 +176,6 @@ async function main() {
     recordUrl: RECORD_URL,
     coverUrl: cover.finalUrl,
     coverPath: "/assets/i-robot-cover.jpg",
-    targetPath: "/assets/i-robot.mind",
     retrievedAt: new Date().toISOString(),
     provenance: {
       ...metadata.provenance,
@@ -185,9 +183,14 @@ async function main() {
       cover: "Penguin Random House ISBN cover endpoint; requires visual approval for the physical copy",
       coverSha256: coverHash,
       coverReviewRequired: coverChanged,
-      targetStale: targetIsStale,
     },
   };
+
+  delete next.targetPath;
+  delete next.provenance.targetCoverSha256;
+  delete next.provenance.targetCompiledAt;
+  delete next.provenance.targetStale;
+  delete next.provenance.targetCompiler;
 
   await atomicWrite(COVER_PATH, cover.bytes);
   await atomicWrite(DATA_PATH, `${JSON.stringify(next, null, 2)}\n`);
@@ -199,12 +202,9 @@ async function main() {
         isbn: EXPECTED_ISBN,
         coverSha256: coverHash,
         coverChanged,
-        targetIsStale,
         nextStep: coverChanged
-          ? "Visually compare the cover with the physical copy, then recompile the .mind target."
-          : targetIsStale
-            ? "Run npm run compile:target and open the printed local URL."
-            : "Cover and target are in sync.",
+          ? "Visually compare the display cover with the physical copy, then run npm run setup:candidates && npm run generate:qrcodes if the multi-book manifest needs refresh."
+          : "Display cover hash is unchanged. QR stickers do not need regeneration for cover-only refreshes.",
       },
       null,
       2,

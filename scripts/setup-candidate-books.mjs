@@ -135,16 +135,12 @@ async function downloadCover(book) {
   return {
     ...book,
     coverUrl: response.url,
-    targetPath: "./assets/banned-books.mind",
     coverStatus: "candidate",
     provenance: {
       metadata: "Curated from SJPL catalog discovery and publisher/Open Library edition data",
       cover: `${finalUrl.hostname} ISBN cover endpoint`,
       coverSha256: sha256(bytes),
       physicalEditionReviewed: false,
-      targetCoverSha256: null,
-      targetCompiledAt: null,
-      targetCompiler: null,
     },
   };
 }
@@ -156,24 +152,19 @@ async function main() {
     id: "i-robot",
     targetIndex: 0,
     coverPath: "./assets/i-robot-cover.jpg",
-    targetPath: "./assets/banned-books.mind",
     coverStatus: "approved",
     catalogSearchUrl: iRobot.recordUrl,
     challengeNote: "Frequently challenged in discussions about science fiction, technology, and the boundaries of human agency.",
     provenance: {
       ...iRobot.provenance,
       physicalEditionReviewed: true,
-      targetCoverSha256: null,
-      targetCompiledAt: null,
-      targetCompiler: null,
     },
   };
 
   const downloaded = [];
   for (const candidate of candidates) downloaded.push(await downloadCover(candidate));
   const manifest = {
-    version: 1,
-    targetPath: "./assets/banned-books.mind",
+    version: 2,
     generatedAt: new Date().toISOString(),
     books: [approved, ...downloaded],
   };
@@ -189,7 +180,7 @@ async function main() {
           coverStatus,
           coverPath,
         })),
-        nextStep: "Visually compare candidate covers with physical copies, then run npm run compile:target.",
+        nextStep: "Run npm run generate:qrcodes, then print /print-qrcodes.html stickers.",
       },
       null,
       2,

@@ -49,7 +49,7 @@ const compilerPage = `<!doctype html>
       <h1>Banned Books AR</h1>
       <ol id="targets"></ol>
       <progress id="progress" max="100" value="0"></progress>
-      <p id="status">Loading the five local covers…</p>
+      <p id="status">Loading the local covers…</p>
     </main>
     <script type="module">
       const status = document.querySelector('#status');
@@ -76,7 +76,7 @@ const compilerPage = `<!doctype html>
           const response = await fetch('/target', { method: 'POST', body: buffer });
           if (!response.ok) throw new Error(await response.text());
           progress.value = 100;
-          status.innerHTML = 'Done. <code>public/assets/banned-books.mind</code> contains all five covers.';
+          status.innerHTML = 'Done. <code>public/assets/banned-books.mind</code> contains ' + manifest.books.length + ' covers.';
         } catch (error) {
           status.textContent = 'Compilation failed: ' + error.message;
           status.style.color = '#ff6b5f';

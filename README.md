@@ -1,8 +1,8 @@
 # Banned Books AR
 
-A mobile-first MindAR vertical slice for five book-cover targets. Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
+A mobile-first MindAR vertical slice for eighteen book-cover targets (seventeen from the installation sheet plus *I, Robot*). Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
 
-The current target pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus four edition candidates: *Adventures of Huckleberry Finn*, *The Merchant of Venice*, *This Earth of Mankind*, and *All Quiet on the Western Front*. Candidate covers must be compared with the physical installation copies before they are marked approved.
+The current target pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus seventeen intake-sheet cover candidates from the Banned Books Week placement list. Candidate covers should still be compared with the physical installation copies when possible.
 
 Deployments:
 
@@ -17,7 +17,15 @@ npm run check:target
 npm run dev
 ```
 
-Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. “Preview without a camera” exercises the result state without camera access.
+Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. “Preview without a camera” exercises the result state without camera access. A sticker QR opens the same preview for one title: `?book=` plus the book id, for example `?book=candide`.
+
+Printable sticker sheet for the 17 Underground books titles:
+
+```bash
+npm run generate:qrcodes
+```
+
+Then open `/print-qrcodes.html`. Each code points at the public site with that book’s `?book=` id.
 
 ```bash
 npm run build
@@ -63,7 +71,7 @@ After an approved or candidate cover changes:
 npm run compile:target
 ```
 
-Open the printed loopback URL once. The page runs MindAR 1.2.5’s compiler in the browser, compiles the five images in target-index order, writes `public/assets/banned-books.mind`, records each exact cover SHA-256 in the manifest, and shuts its local server down. Then run `npm run check:target`.
+Open the printed loopback URL once. The page runs MindAR 1.2.5’s compiler in the browser, compiles every cover in target-index order, writes `public/assets/banned-books.mind`, records each exact cover SHA-256 in the manifest, and shuts its local server down. Then run `npm run check:target`.
 
 See [docs/AR_LOGIC.md](docs/AR_LOGIC.md) for the state machine, data flow, and the path to more books.
 

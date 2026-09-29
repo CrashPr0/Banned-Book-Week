@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#080808" />
     <meta
       name="description"
-      content="Scan one of five Banned Books Week covers to reveal an augmented-reality book summary."
+      content="Scan one of 18 Banned Books Week covers to reveal an augmented-reality book summary."
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Banned Books AR</title>
@@ -25,26 +25,95 @@
           device-orientation-permission-ui="enabled: false"
           embedded
         >
-          <a-assets timeout="12000">
-            <img id="cover-i-robot" src="./assets/i-robot-cover.jpg" alt="" />
+          <a-assets timeout="45000">
+            <img
+              id="cover-i-robot"
+              src="./assets/i-robot-cover.jpg"
+              alt=""
+            />
             <img
               id="cover-huckleberry-finn"
-              src="./assets/covers/huckleberry-finn-9780143107323.jpg"
+              src="./assets/covers/huckleberry-finn-9780553210798.jpg"
               alt=""
             />
             <img
               id="cover-merchant-of-venice"
-              src="./assets/covers/merchant-of-venice-9780810997172.jpg"
+              src="./assets/covers/merchant-of-venice-title-page.jpg"
               alt=""
             />
             <img
               id="cover-this-earth-of-mankind"
-              src="./assets/covers/this-earth-of-mankind-9780140256352.jpg"
+              src="./assets/covers/this-earth-of-mankind-bumi-manusia.jpg"
               alt=""
             />
             <img
               id="cover-all-quiet-western-front"
-              src="./assets/covers/all-quiet-western-front-9780449213940.jpg"
+              src="./assets/covers/all-quiet-western-front-1929.jpg"
+              alt=""
+            />
+            <img
+              id="cover-harry-potter"
+              src="./assets/covers/harry-potter.jpg"
+              alt=""
+            />
+            <img
+              id="cover-philosophy-of-spinoza"
+              src="./assets/covers/philosophy-of-spinoza.jpg"
+              alt=""
+            />
+            <img
+              id="cover-noli-me-tangere"
+              src="./assets/covers/noli-me-tangere.jpg"
+              alt=""
+            />
+            <img
+              id="cover-mencius"
+              src="./assets/covers/mencius.jpg"
+              alt=""
+            />
+            <img
+              id="cover-ulysses"
+              src="./assets/covers/ulysses.jpg"
+              alt=""
+            />
+            <img
+              id="cover-holy-quran"
+              src="./assets/covers/holy-quran.jpg"
+              alt=""
+            />
+            <img
+              id="cover-holy-bible"
+              src="./assets/covers/holy-bible.jpg"
+              alt=""
+            />
+            <img
+              id="cover-emile"
+              src="./assets/covers/emile.jpg"
+              alt=""
+            />
+            <img
+              id="cover-satanic-verses"
+              src="./assets/covers/satanic-verses.jpg"
+              alt=""
+            />
+            <img
+              id="cover-chairil-anwar-selected-poems"
+              src="./assets/covers/chairil-anwar-selected-poems.jpg"
+              alt=""
+            />
+            <img
+              id="cover-two-new-sciences"
+              src="./assets/covers/two-new-sciences.jpg"
+              alt=""
+            />
+            <img
+              id="cover-candide"
+              src="./assets/covers/candide.jpg"
+              alt=""
+            />
+            <img
+              id="cover-origin-of-species"
+              src="./assets/covers/origin-of-species.jpg"
               alt=""
             />
           </a-assets>
@@ -114,6 +183,19 @@
           <a-entity class="book-target" data-target-index="2" mindar-image-target="targetIndex: 2"></a-entity>
           <a-entity class="book-target" data-target-index="3" mindar-image-target="targetIndex: 3"></a-entity>
           <a-entity class="book-target" data-target-index="4" mindar-image-target="targetIndex: 4"></a-entity>
+          <a-entity class="book-target" data-target-index="5" mindar-image-target="targetIndex: 5"></a-entity>
+          <a-entity class="book-target" data-target-index="6" mindar-image-target="targetIndex: 6"></a-entity>
+          <a-entity class="book-target" data-target-index="7" mindar-image-target="targetIndex: 7"></a-entity>
+          <a-entity class="book-target" data-target-index="8" mindar-image-target="targetIndex: 8"></a-entity>
+          <a-entity class="book-target" data-target-index="9" mindar-image-target="targetIndex: 9"></a-entity>
+          <a-entity class="book-target" data-target-index="10" mindar-image-target="targetIndex: 10"></a-entity>
+          <a-entity class="book-target" data-target-index="11" mindar-image-target="targetIndex: 11"></a-entity>
+          <a-entity class="book-target" data-target-index="12" mindar-image-target="targetIndex: 12"></a-entity>
+          <a-entity class="book-target" data-target-index="13" mindar-image-target="targetIndex: 13"></a-entity>
+          <a-entity class="book-target" data-target-index="14" mindar-image-target="targetIndex: 14"></a-entity>
+          <a-entity class="book-target" data-target-index="15" mindar-image-target="targetIndex: 15"></a-entity>
+          <a-entity class="book-target" data-target-index="16" mindar-image-target="targetIndex: 16"></a-entity>
+          <a-entity class="book-target" data-target-index="17" mindar-image-target="targetIndex: 17"></a-entity>
         </a-scene>
 
         <div class="camera-shade" aria-hidden="true"></div>
@@ -148,8 +230,8 @@
 
         <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">
           <div class="intro-panel__edition">
-            <span>5 COVER TARGETS</span>
-            <span id="intro-isbn">5 COVER TARGETS</span>
+            <span id="intro-target-count">18 COVER TARGETS</span>
+            <span id="intro-isbn">18 COVER TARGETS</span>
           </div>
           <div class="intro-panel__book">
             <img id="intro-cover" src="./assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />

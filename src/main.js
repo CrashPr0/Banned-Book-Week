@@ -155,15 +155,21 @@ function showError(message) {
   setPhase("error");
 }
 
-function openDemo() {
+function openDemo(matchedBook = books[0]) {
   if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
-  if (books[0]) applyBookData(books[0]);
+  if (matchedBook) applyBookData(matchedBook);
   setPhase("demo");
+}
+
+function bookFromLocation() {
+  const fromQuery = new URLSearchParams(location.search).get("book");
+  if (!fromQuery) return null;
+  return books.find((entry) => entry.id === fromQuery) ?? null;
 }
 
 function applyBookData(data) {
   book = data;
-  const author = data.authors?.[0] ?? "Unknown author";
+  const author = data.authors?.[0] || (data.id === "holy-quran" || data.id === "holy-bible" ? "Sacred text" : "Unknown author");
   const isbn = data.isbn?.[0] ?? "EDITION PENDING";
   const status = data.coverStatus === "approved" ? "APPROVED COVER" : "CANDIDATE COVER";
   const number = targetLabel(data);
@@ -208,8 +214,13 @@ async function loadBookData() {
     books.forEach((entry, index) => {
       if (entry.targetIndex !== index) throw new Error("Target indexes are not contiguous.");
     });
-    applyBookData(books[0]);
-    setPhase("intro");
+    const deepLinked = bookFromLocation();
+    applyBookData(deepLinked ?? books[0]);
+    const countLabel = `${books.length} COVER TARGETS`;
+    const countEl = document.querySelector("#intro-target-count");
+    if (countEl) countEl.textContent = countLabel;
+    if (deepLinked) setPhase("demo");
+    else setPhase("intro");
   } catch (error) {
     console.warn("The multi-book manifest could not be loaded.", error);
     dom.startButton.disabled = true;

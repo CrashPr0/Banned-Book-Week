@@ -12,14 +12,14 @@ const candidates = [
     targetIndex: 1,
     title: "Adventures of Huckleberry Finn",
     authors: ["Mark Twain"],
-    edition: "Penguin Classics paperback candidate",
-    publication: "New York : Penguin Books, 2014",
-    isbn: ["9780143107323", "0143107321"],
+    edition: "Bantam Classic paperback (intake sheet)",
+    publication: "Bantam Classic; ISBN from intake BookOutlet cover",
+    isbn: ["9780553210798", "0553210793"],
     recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C6530705",
     catalogSearchUrl:
       "https://sjpl.bibliocommons.com/v2/search?query=Adventures%20of%20Huckleberry%20Finn&searchType=title",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780143107323-L.jpg",
-    coverPath: "./assets/covers/huckleberry-finn-9780143107323.jpg",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780553210798-L.jpg",
+    coverPath: "./assets/covers/huckleberry-finn-9780553210798.jpg",
     displaySummary:
       "Huck Finn escapes an abusive home and travels the Mississippi with Jim, who is fleeing slavery. Their journey exposes the violence, fraud, prejudice, and moral compromises beneath the promise of freedom.",
     arSummary:
@@ -31,17 +31,17 @@ const candidates = [
     id: "merchant-of-venice",
     targetIndex: 2,
     title: "The Merchant of Venice",
-    authors: ["William Shakespeare", "Richard Appignanesi", "Faye Yong"],
-    edition: "Manga Shakespeare edition candidate",
-    publication: "New York : Amulet Books, 2011",
-    isbn: ["9780810997172", "0810997177"],
+    authors: ["William Shakespeare"],
+    edition: "Historical title-page candidate (intake Look and Learn / Commons)",
+    publication: "Early printed edition title page",
+    isbn: [],
     recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C4107722",
     catalogSearchUrl:
       "https://sjpl.bibliocommons.com/v2/search?query=Merchant%20of%20Venice&searchType=title",
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9780810997172-L.jpg",
-    coverPath: "./assets/covers/merchant-of-venice-9780810997172.jpg",
+    coverUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Merchant_venice_tp.jpg",
+    coverPath: "./assets/covers/merchant-of-venice-title-page.jpg",
     displaySummary:
-      "A loan made for love turns into a demand for a pound of flesh. This manga adaptation stages Shakespeare's collision of debt, prejudice, revenge, and mercy in sixteenth-century Venice.",
+      "A loan made for love turns into a demand for a pound of flesh. Shakespeare's collision of debt, prejudice, revenge, and mercy unfolds in sixteenth-century Venice.",
     arSummary:
       "A dangerous loan brings love, law, prejudice, revenge, and mercy into conflict in sixteenth-century Venice.",
     challengeNote:
@@ -52,14 +52,15 @@ const candidates = [
     targetIndex: 3,
     title: "This Earth of Mankind",
     authors: ["Pramoedya Ananta Toer"],
-    edition: "Penguin Books paperback candidate",
-    publication: "New York : Penguin Books, 1996",
-    isbn: ["9780140256352", "0140256350"],
+    edition: "Hasta Mitra Indonesian edition (intake Goodreads cover)",
+    publication: "Jakarta : Hasta Mitra",
+    isbn: [],
     recordUrl: null,
     catalogSearchUrl:
       "https://sjpl.bibliocommons.com/v2/search?query=This%20Earth%20of%20Mankind&searchType=title",
-    coverUrl: "https://images.penguinrandomhouse.com/cover/9780140256352",
-    coverPath: "./assets/covers/this-earth-of-mankind-9780140256352.jpg",
+    coverUrl:
+      "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1464893084i/6496019.jpg",
+    coverPath: "./assets/covers/this-earth-of-mankind-bumi-manusia.jpg",
     displaySummary:
       "In colonial Java, gifted student Minke moves between European schooling and an Indonesian society constrained by race and class. Love and injustice push him toward a new political consciousness.",
     arSummary:
@@ -72,14 +73,14 @@ const candidates = [
     targetIndex: 4,
     title: "All Quiet on the Western Front",
     authors: ["Erich Maria Remarque"],
-    edition: "Ballantine Books paperback candidate",
-    publication: "New York : Ballantine Books, 1987",
-    isbn: ["9780449213940", "0449213943"],
+    edition: "1929 German first-edition jacket (intake Commons candidate)",
+    publication: "Berlin : Propyläen-Verlag, 1929",
+    isbn: [],
     recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C2241781",
     catalogSearchUrl:
       "https://sjpl.bibliocommons.com/v2/search?query=All%20Quiet%20on%20the%20Western%20Front&searchType=title",
-    coverUrl: "https://images.penguinrandomhouse.com/cover/9780449213940",
-    coverPath: "./assets/covers/all-quiet-western-front-9780449213940.jpg",
+    coverUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Remarque_Im_Westen_nichts_Neues_1929.jpg",
+    coverPath: "./assets/covers/all-quiet-western-front-1929.jpg",
     displaySummary:
       "Paul Bäumer and his classmates enlist in the German army during World War I. Trench warfare strips away their patriotic ideals and leaves them struggling to preserve their humanity.",
     arSummary:
@@ -93,6 +94,8 @@ function isAllowedHost(hostname) {
   return (
     hostname === "covers.openlibrary.org" ||
     hostname === "images.penguinrandomhouse.com" ||
+    hostname === "upload.wikimedia.org" ||
+    hostname === "m.media-amazon.com" ||
     hostname.endsWith(".us.archive.org")
   );
 }

@@ -8,10 +8,13 @@
     "build": "vite build",
     "scrape": "node scripts/scrape-book.mjs",
     "setup:candidates": "node scripts/setup-candidate-books.mjs",
+    "mirror:intake": "node scripts/mirror-intake-media.mjs",
+    "generate:qrcodes": "node scripts/generate-qrcodes.mjs",
     "compile:target": "node scripts/compile-target-server.mjs",
     "check:target": "node scripts/check-target-freshness.mjs"
   },
   "devDependencies": {
+    "qrcode": "^1.5.4",
     "vite": "8.3.0"
   }
 }

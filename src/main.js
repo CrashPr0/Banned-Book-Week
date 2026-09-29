@@ -8,6 +8,9 @@ const dom = {
   statusLabel: document.querySelector("#status-label"),
   scanFooterCopy: document.querySelector("#scan-footer-copy"),
   introPanel: document.querySelector("#intro-panel"),
+  collectionPanel: document.querySelector("#collection-panel"),
+  collectionGrid: document.querySelector("#collection-grid"),
+  collectionClose: document.querySelector("#collection-close"),
   resultPanel: document.querySelector("#result-panel"),
   errorPanel: document.querySelector("#error-panel"),
   errorMessage: document.querySelector("#error-message"),
@@ -22,11 +25,7 @@ const dom = {
   coverStatus: document.querySelector("#cover-status"),
   catalogLink: document.querySelector("#catalog-link"),
   matchBadge: document.querySelector("#match-badge"),
-  introCover: document.querySelector("#intro-cover"),
   demoCover: document.querySelector("#demo-cover"),
-  introIsbn: document.querySelector("#intro-isbn"),
-  introTargetLabel: document.querySelector("#intro-target-label"),
-  introTitle: document.querySelector("#intro-title"),
   arCover: document.querySelector("#ar-cover"),
   arTitle: document.querySelector("#ar-title"),
   arKicker: document.querySelector("#ar-kicker"),
@@ -52,6 +51,7 @@ function phaseCopy(nextPhase) {
     tracked: ["MATCHED", `${targetLabel()} LOCKED`],
     lost: ["SEARCHING", "MOVE BACK TO THE COVER"],
     demo: ["PREVIEW", "SIMULATED MATCH"],
+    collection: ["COLLECTION", `${count} FEATURED BOOKS`],
     error: ["OFFLINE", "CAMERA NOT STARTED"],
   };
   return copy[nextPhase] ?? copy.intro;
@@ -68,6 +68,7 @@ function setPhase(nextPhase) {
   dom.resultPanel.setAttribute("aria-hidden", String(!resultVisible));
   dom.errorPanel.setAttribute("aria-hidden", String(nextPhase !== "error"));
   dom.introPanel.setAttribute("aria-hidden", String(nextPhase !== "intro"));
+  dom.collectionPanel.setAttribute("aria-hidden", String(nextPhase !== "collection"));
 }
 
 function supportsWebGL() {
@@ -146,7 +147,8 @@ async function stopCamera() {
   }
   dom.content.setAttribute("scale", "0.001 0.001 0.001");
   activeTarget = null;
-  if (books[0]) applyBookData(books[0]);
+  book = null;
+  document.title = "Let Books Be — Banned Books Week AR";
   setPhase("intro");
 }
 
@@ -155,10 +157,26 @@ function showError(message) {
   setPhase("error");
 }
 
-function openDemo(matchedBook = books[0]) {
+function openDemo(matchedBook) {
   if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
-  if (matchedBook) applyBookData(matchedBook);
+  if (!matchedBook) {
+    openCollection();
+    return;
+  }
+  applyBookData(matchedBook);
   setPhase("demo");
+}
+
+function openCollection() {
+  if (phase !== "intro" && phase !== "error" && phase !== "collection") arSystem?.stop?.();
+  setPhase("collection");
+  dom.collectionClose.focus();
+}
+
+function closeCollection() {
+  document.title = "Let Books Be — Banned Books Week AR";
+  setPhase("intro");
+  dom.demoButton.focus();
 }
 
 function bookFromLocation() {
@@ -169,8 +187,6 @@ function bookFromLocation() {
 
 function applyBookData(data) {
   book = data;
-  const author = data.authors?.[0] || (data.id === "holy-quran" || data.id === "holy-bible" ? "Sacred text" : "Unknown author");
-  const isbn = data.isbn?.[0] ?? "EDITION PENDING";
   const status = data.coverStatus === "approved" ? "APPROVED COVER" : "CANDIDATE COVER";
   const number = targetLabel(data);
   const coverSelector = `#cover-${data.id}`;
@@ -187,19 +203,41 @@ function applyBookData(data) {
   dom.catalogLink.href = catalogUrl;
   dom.catalogLink.firstChild.textContent = data.recordUrl ? "VIEW SJPL RECORD " : "SEARCH SJPL CATALOG ";
 
-  dom.introTitle.textContent = data.title;
-  dom.introIsbn.textContent = `ISBN ${isbn}`;
-  dom.introTargetLabel.textContent = `${number} / ${status}`;
-  dom.introCover.src = data.coverPath;
-  dom.introCover.alt = coverAlt;
   dom.demoCover.src = data.coverPath;
   dom.demoCover.alt = coverAlt;
-  document.querySelector(".author").textContent = author;
 
   dom.arCover.setAttribute("src", coverSelector);
   dom.arTitle.setAttribute("value", data.title.toUpperCase());
   dom.arKicker.setAttribute("value", `FOUND / ${status}`);
   dom.arSummary.setAttribute("value", data.arSummary);
+}
+
+function renderCollection() {
+  dom.collectionGrid.replaceChildren();
+  for (const entry of books) {
+    const card = document.createElement("button");
+    card.className = "book-card";
+    card.type = "button";
+    card.setAttribute("aria-label", `Preview ${entry.title}`);
+
+    const cover = document.createElement("img");
+    cover.src = entry.coverPath;
+    cover.alt = "";
+
+    const copy = document.createElement("span");
+    copy.className = "book-card__copy";
+    const index = document.createElement("span");
+    index.className = "book-card__index";
+    index.textContent = `BOOK ${String(entry.targetIndex + 1).padStart(2, "0")}`;
+    const title = document.createElement("strong");
+    title.textContent = entry.title;
+    const author = document.createElement("span");
+    author.textContent = entry.authors?.[0] || "Sacred text";
+    copy.append(index, title, author);
+    card.append(cover, copy);
+    card.addEventListener("click", () => openDemo(entry));
+    dom.collectionGrid.append(card);
+  }
 }
 
 async function loadBookData() {
@@ -214,13 +252,19 @@ async function loadBookData() {
     books.forEach((entry, index) => {
       if (entry.targetIndex !== index) throw new Error("Target indexes are not contiguous.");
     });
+    renderCollection();
     const deepLinked = bookFromLocation();
-    applyBookData(deepLinked ?? books[0]);
     const countLabel = `${books.length} COVER TARGETS`;
     const countEl = document.querySelector("#intro-target-count");
     if (countEl) countEl.textContent = countLabel;
-    if (deepLinked) setPhase("demo");
-    else setPhase("intro");
+    if (deepLinked) {
+      applyBookData(deepLinked);
+      setPhase("demo");
+    } else {
+      book = null;
+      document.title = "Let Books Be — Banned Books Week AR";
+      setPhase("intro");
+    }
   } catch (error) {
     console.warn("The multi-book manifest could not be loaded.", error);
     dom.startButton.disabled = true;
@@ -258,13 +302,16 @@ for (const target of dom.targets) {
 }
 
 dom.startButton.addEventListener("click", startCamera);
-dom.demoButton.addEventListener("click", openDemo);
+dom.demoButton.addEventListener("click", openCollection);
 dom.retryButton.addEventListener("click", startCamera);
-dom.fallbackButton.addEventListener("click", openDemo);
+dom.fallbackButton.addEventListener("click", openCollection);
 dom.exitButton.addEventListener("click", stopCamera);
+dom.collectionClose.addEventListener("click", closeCollection);
 
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && phase !== "intro") stopCamera();
+  if (event.key !== "Escape" || phase === "intro") return;
+  if (phase === "collection") closeCollection();
+  else stopCamera();
 });
 window.addEventListener("pagehide", () => arSystem?.stop?.());
 

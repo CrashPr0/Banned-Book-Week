@@ -1,6 +1,6 @@
 # Banned Books AR
 
-A mobile-first MindAR vertical slice for eighteen book-cover targets (seventeen from the installation sheet plus *I, Robot*). Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
+A mobile-first MindAR experience for eighteen book-cover targets (seventeen from the installation sheet plus *I, Robot*). The event-first landing page uses the supplied 2026 **Let Books Be** campaign banner; no individual title is presented as the main theme. Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
 
 The current target pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus seventeen intake-sheet cover candidates from the Banned Books Week placement list. Candidate covers should still be compared with the physical installation copies when possible.
 
@@ -17,7 +17,7 @@ npm run check:target
 npm run dev
 ```
 
-Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. “Preview without a camera” exercises the result state without camera access. A sticker QR opens the same preview for one title: `?book=` plus the book id, for example `?book=candide`.
+Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. **Browse all featured books** opens the cover collection and exercises any title’s result state without camera access. A sticker QR opens the same preview for one title: `?book=` plus the book id, for example `?book=candide`.
 
 Printable sticker sheet for the 17 Underground books titles:
 

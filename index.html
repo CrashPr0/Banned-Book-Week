@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#080808" />
+    <meta name="theme-color" content="#fff6e7" />
     <meta
       name="description"
       content="Scan one of 18 Banned Books Week covers to reveal an augmented-reality book summary."
@@ -201,9 +201,9 @@
         <div class="camera-shade" aria-hidden="true"></div>
 
         <header class="topbar">
-          <div class="project-mark" aria-label="Banned Books AR">
-            <span class="project-mark__index">01</span>
-            <span>BANNED<br />BOOKS AR</span>
+          <div class="project-mark" aria-label="Let Books Be AR scanner">
+            <span class="project-mark__word">LET BOOKS BE</span>
+            <span>AR SCANNER</span>
           </div>
           <div id="status-chip" class="status-chip" role="status" aria-live="polite">
             <span class="status-chip__dot" aria-hidden="true"></span>
@@ -229,25 +229,58 @@
         </div>
 
         <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">
-          <div class="intro-panel__edition">
-            <span id="intro-target-count">18 COVER TARGETS</span>
-            <span id="intro-isbn">18 COVER TARGETS</span>
+          <div class="event-banner event-banner--desktop">
+            <img
+              src="./assets/banned-books-week-banner.png"
+              alt="Let Books Be. October 4th through 10th, 2026, Banned Books Week. Protect the freedom to read. Presented by SJSU King Library, the College of Humanities and the Arts, the Pride Center, the Campus Reading Program, and the Ethnic Studies Collaborative."
+            />
           </div>
-          <div class="intro-panel__book">
-            <img id="intro-cover" src="./assets/i-robot-cover.jpg" alt="Bantam trade paperback cover of I, Robot" />
-            <div>
-              <p id="intro-target-label" class="eyebrow">TARGET 01 / APPROVED COVER</p>
-              <h1 id="intro-title">I, Robot</h1>
-              <p class="author">Isaac Asimov</p>
-              <p class="instruction">Place the entire front cover inside the frame. Keep it flat and avoid glare.</p>
+          <div class="event-banner event-banner--mobile">
+            <div class="partner-lockup">
+              <strong>SJSU</strong>
+              <span>KING LIBRARY · PRIDE CENTER · CAMPUS READING PROGRAM</span>
+            </div>
+            <div class="mobile-wordmark">
+              <span class="mobile-wordmark__let">LET</span>
+              <span class="mobile-wordmark__books">BOOKS</span>
+              <span class="mobile-wordmark__be">BE</span>
+            </div>
+            <div class="mobile-event-meta">
+              <span>October 4th–10th, 2026</span>
+              <strong>BANNED BOOKS WEEK</strong>
+            </div>
+            <p>PROTECT THE FREEDOM TO READ.</p>
+          </div>
+
+          <div class="landing-actions">
+            <div class="landing-actions__copy">
+              <p class="landing-kicker"><span id="intro-target-count">18 BOOKS</span> · 8 FLOORS · ONE LIBRARY</p>
+              <h1 id="intro-title">Scan a cover.<br />Uncover its story.</h1>
+              <p>
+                Find a featured book in King Library, point your camera at its cover, and reveal the story
+                behind the book.
+              </p>
+            </div>
+            <div class="landing-actions__controls">
+              <button id="start-button" class="primary-button" type="button">
+                <span>START THE AR SCANNER</span>
+                <span aria-hidden="true">↗</span>
+              </button>
+              <button id="demo-button" class="text-button" type="button">Browse all featured books</button>
+              <p class="privacy-note">Camera processing stays on this device and is never recorded.</p>
             </div>
           </div>
-          <button id="start-button" class="primary-button" type="button">
-            <span>START CAMERA</span>
-            <span aria-hidden="true">↗</span>
-          </button>
-          <button id="demo-button" class="text-button" type="button">Preview without a camera</button>
-          <p class="privacy-note">Camera video stays on this device and is not recorded.</p>
+        </section>
+
+        <section id="collection-panel" class="collection-panel" aria-labelledby="collection-title" aria-hidden="true">
+          <header class="collection-panel__header">
+            <div>
+              <p class="landing-kicker">THE UNDERGROUND COLLECTION</p>
+              <h2 id="collection-title">Choose a book to preview</h2>
+            </div>
+            <button id="collection-close" class="collection-close" type="button" aria-label="Close collection">×</button>
+          </header>
+          <div id="collection-grid" class="collection-grid"></div>
         </section>
 
         <section id="result-panel" class="result-panel" aria-labelledby="result-title" aria-hidden="true">
@@ -281,7 +314,7 @@
           <p id="error-message">Camera access needs HTTPS or localhost and permission to use the rear camera.</p>
           <div class="error-panel__actions">
             <button id="retry-button" class="primary-button" type="button">TRY AGAIN</button>
-            <button id="fallback-button" class="text-button" type="button">Open preview</button>
+            <button id="fallback-button" class="text-button" type="button">Browse collection</button>
           </div>
         </div>
 

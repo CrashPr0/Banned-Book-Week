@@ -51,9 +51,9 @@ const candidates = [
     coverUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Merchant_venice_tp.jpg",
     coverPath: "./assets/covers/merchant-of-venice-title-page.jpg",
     displaySummary:
-      "A loan made for love turns into a demand for a pound of flesh. Shakespeare's collision of debt, prejudice, revenge, and mercy unfolds in sixteenth-century Venice.",
+      "A loan made for love turns into a demand for a pound of flesh. Shakespeare's comedy stages a collision of debt, prejudice, revenge, and mercy in sixteenth-century Venice.",
     arSummary:
-      "A dangerous loan brings love, law, prejudice, revenge, and mercy into conflict in sixteenth-century Venice.",
+      "Shakespeare's play brings love, law, prejudice, revenge, and mercy into conflict through a deadly bond in Venice.",
     challengeNote:
       "Often debated or challenged because of antisemitic characterization and questions about how the play should be taught.",
   },

@@ -57,7 +57,7 @@ Intake sheet is source of truth. The four former edition mismatches were swapped
 
 ## Per-book production checklist
 
-- Confirm title, author/translator, ISBN, and SJPL record against the physical copy.
+- Confirm title, author/translator, ISBN, and SJSU King Library OneSearch record against the physical copy.
 - Take a glare-free, straight-on cover photo at high resolution.
 - Compare any publisher/catalog image pixel-for-pixel by eye; prefer the physical photo when jackets, stickers, or library binding differ.
 - Write a short display summary and challenge/banning context with cited sources.

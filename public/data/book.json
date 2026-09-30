@@ -1,6 +1,6 @@
 {
   "recordId": "S156C6635382",
-  "recordUrl": "https://sjpl.bibliocommons.com/v2/record/S156C6635382",
+  "recordUrl": "https://csu-sjsu.primo.exlibrisgroup.com/discovery/search?query=title%2Ccontains%2CI+Robot&tab=LibraryCatalog&search_scope=MyInstitution&vid=01CALS_SJO%3A01CALS_SJO&offset=0",
   "title": "I, Robot",
   "authors": [
     "Isaac Asimov"
@@ -21,7 +21,7 @@
   "sourceDescription": "This classic science fiction masterwork weaves stories about robots, humanity, and the deep questions of existence into a novel of shocking intelligence and heart.",
   "retrievedAt": "2026-09-13T00:00:00.226Z",
   "provenance": {
-    "metadata": "SJPL / BiblioCommons JSON-LD",
+    "metadata": "SJSU King Library OneSearch / prior SJPL intake",
     "cover": "Penguin Random House ISBN cover endpoint; requires visual approval for the physical copy",
     "coverSha256": "b801555f767fde3c4128740efac401f97604360eabf9809f4710664516d63570",
     "coverReviewRequired": false,

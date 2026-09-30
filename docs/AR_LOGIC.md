@@ -46,7 +46,7 @@ The app does not call `getUserMedia()` separately. MindAR owns the single camera
 - Each manifest entry connects its record, ISBN, local cover, summary, source URLs, review state, hashes, and compilation time.
 - Target 0 is the approved *I, Robot* cover. Targets 1–4 are explicit edition candidates until checked against the physical books.
 - The target-anchored scene displays a floating cover and short summary in 3D.
-- The DOM result sheet repeats the summary at normal reading size, remains keyboard accessible, and links to the original SJPL record.
+- The DOM result sheet repeats the summary at normal reading size, remains keyboard accessible, and links to the SJSU King Library OneSearch catalog.
 
 ## Add another book
 

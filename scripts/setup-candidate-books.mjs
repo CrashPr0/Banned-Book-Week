@@ -6,6 +6,18 @@ const root = resolve(import.meta.dirname, "..");
 const outputPath = resolve(root, "public/data/books.json");
 const userAgent = "BannedBooksARPrototype/0.2 (+local-curation; contact project owner)";
 
+function sjsuTitleSearch(title) {
+  const safeTitle = String(title).replaceAll(",", " ").replace(/\s+/g, " ").trim();
+  const params = new URLSearchParams({
+    query: `title,contains,${safeTitle}`,
+    tab: "LibraryCatalog",
+    search_scope: "MyInstitution",
+    vid: "01CALS_SJO:01CALS_SJO",
+    offset: "0",
+  });
+  return `https://csu-sjsu.primo.exlibrisgroup.com/discovery/search?${params.toString()}`;
+}
+
 const candidates = [
   {
     id: "huckleberry-finn",
@@ -15,9 +27,8 @@ const candidates = [
     edition: "Bantam Classic paperback (intake sheet)",
     publication: "Bantam Classic; ISBN from intake BookOutlet cover",
     isbn: ["9780553210798", "0553210793"],
-    recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C6530705",
-    catalogSearchUrl:
-      "https://sjpl.bibliocommons.com/v2/search?query=Adventures%20of%20Huckleberry%20Finn&searchType=title",
+    recordUrl: null,
+    catalogSearchUrl: sjsuTitleSearch("Adventures of Huckleberry Finn"),
     coverUrl: "https://covers.openlibrary.org/b/isbn/9780553210798-L.jpg",
     coverPath: "./assets/covers/huckleberry-finn-9780553210798.jpg",
     displaySummary:
@@ -35,9 +46,8 @@ const candidates = [
     edition: "Historical title-page candidate (intake Look and Learn / Commons)",
     publication: "Early printed edition title page",
     isbn: [],
-    recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C4107722",
-    catalogSearchUrl:
-      "https://sjpl.bibliocommons.com/v2/search?query=Merchant%20of%20Venice&searchType=title",
+    recordUrl: null,
+    catalogSearchUrl: sjsuTitleSearch("The Merchant of Venice"),
     coverUrl: "https://upload.wikimedia.org/wikipedia/commons/5/52/Merchant_venice_tp.jpg",
     coverPath: "./assets/covers/merchant-of-venice-title-page.jpg",
     displaySummary:
@@ -56,8 +66,7 @@ const candidates = [
     publication: "Jakarta : Hasta Mitra",
     isbn: [],
     recordUrl: null,
-    catalogSearchUrl:
-      "https://sjpl.bibliocommons.com/v2/search?query=This%20Earth%20of%20Mankind&searchType=title",
+    catalogSearchUrl: sjsuTitleSearch("This Earth of Mankind"),
     coverUrl:
       "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1464893084i/6496019.jpg",
     coverPath: "./assets/covers/this-earth-of-mankind-bumi-manusia.jpg",
@@ -76,9 +85,8 @@ const candidates = [
     edition: "1929 German first-edition jacket (intake Commons candidate)",
     publication: "Berlin : Propyläen-Verlag, 1929",
     isbn: [],
-    recordUrl: "https://sjpl.bibliocommons.com/v2/record/S156C2241781",
-    catalogSearchUrl:
-      "https://sjpl.bibliocommons.com/v2/search?query=All%20Quiet%20on%20the%20Western%20Front&searchType=title",
+    recordUrl: null,
+    catalogSearchUrl: sjsuTitleSearch("All Quiet on the Western Front"),
     coverUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Remarque_Im_Westen_nichts_Neues_1929.jpg",
     coverPath: "./assets/covers/all-quiet-western-front-1929.jpg",
     displaySummary:
@@ -141,7 +149,7 @@ async function downloadCover(book) {
     targetPath: "./assets/banned-books.mind",
     coverStatus: "candidate",
     provenance: {
-      metadata: "Curated from SJPL catalog discovery and publisher/Open Library edition data",
+      metadata: "Curated from SJSU King Library placement intake and publisher/Open Library edition data",
       cover: `${finalUrl.hostname} ISBN cover endpoint`,
       coverSha256: sha256(bytes),
       physicalEditionReviewed: false,

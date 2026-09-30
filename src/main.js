@@ -320,7 +320,7 @@ function applyBookData(data) {
   dom.coverStatus.dataset.status = data.coverStatus;
   dom.matchBadge.textContent = `MATCH ${number.slice(-2)}`;
   dom.catalogLink.href = catalogUrl;
-  dom.catalogLink.firstChild.textContent = data.recordUrl ? "VIEW SJPL RECORD " : "SEARCH SJPL CATALOG ";
+  dom.catalogLink.firstChild.textContent = "View SJSU King Library Record ";
 
   dom.demoCover.src = data.coverPath;
   dom.demoCover.alt = coverAlt;

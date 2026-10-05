@@ -56,9 +56,12 @@ function phaseCopy(nextPhase) {
     intro: ["READY", `${count} COVER TARGETS`],
     starting: ["STARTING", "OPENING CAMERA"],
     scanning: ["SCANNING", `QR STICKERS OR ${count} COVERS`],
-    tracked: ["MATCHED", `${targetLabel()} LOCKED`],
+    tracked: ["MATCHED", recognitionSource === "qr" ? `${targetLabel()} QR RECOGNIZED` : `${targetLabel()} LOCKED`],
     lost: ["SEARCHING", "MOVE BACK TO THE COVER"],
-    demo: ["PREVIEW", "SIMULATED MATCH"],
+    demo:
+      recognitionSource === "qr"
+        ? ["MATCHED", `${targetLabel()} QR RECOGNIZED`]
+        : ["PREVIEW", "SIMULATED MATCH"],
     collection: ["COLLECTION", `${count} FEATURED BOOKS`],
     error: ["OFFLINE", "CAMERA NOT STARTED"],
   };
@@ -164,8 +167,14 @@ function resolveBookFromPayload(raw) {
 
 function setRecognitionSource(source) {
   recognitionSource = source;
+  dom.body.dataset.recognitionSource = source;
   if (dom.resultEyebrow) {
-    dom.resultEyebrow.textContent = source === "qr" ? "QR RECOGNIZED" : "COVER RECOGNIZED";
+    const labels = {
+      cover: "COVER RECOGNIZED",
+      preview: "BOOK PREVIEW",
+      qr: "QR RECOGNIZED",
+    };
+    dom.resultEyebrow.textContent = labels[source] ?? labels.cover;
   }
 }
 
@@ -282,6 +291,7 @@ function openDemo(matchedBook) {
     openCollection();
     return;
   }
+  setRecognitionSource("preview");
   applyBookData(matchedBook);
   setPhase("demo");
 }
@@ -377,6 +387,7 @@ async function loadBookData() {
     const countEl = document.querySelector("#intro-target-count");
     if (countEl) countEl.textContent = countLabel;
     if (deepLinked) {
+      setRecognitionSource("qr");
       applyBookData(deepLinked);
       setPhase("demo");
     } else {

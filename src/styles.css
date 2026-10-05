@@ -675,28 +675,72 @@ body[data-phase="lost"] .scan-footer {
 
 .demo-card {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   top: 37%;
   left: 50%;
   display: none;
   width: min(43vw, 210px);
   aspect-ratio: 2 / 3;
-  transform: translate(-50%, -50%) perspective(700px) rotateY(-7deg) rotateZ(-2deg);
-  filter: drop-shadow(0 32px 28px rgba(0, 0, 0, 0.6));
+  perspective: 900px;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
 }
 
-body[data-phase="demo"] .demo-card {
+body[data-phase="demo"] .demo-card,
+body[data-phase="tracked"][data-recognition-source="qr"] .demo-card {
   display: block;
-  animation: hover 2.5s ease-in-out infinite alternate;
 }
 
-.demo-card::before {
+.demo-card__float {
   position: absolute;
-  z-index: -1;
-  inset: -10px;
-  content: "";
-  border: 2px solid var(--pink);
-  box-shadow: 0 0 52px rgba(243, 165, 189, 0.38);
+  inset: 0;
+  animation: book-hover 2.5s ease-in-out infinite alternate;
+  transform-style: preserve-3d;
+}
+
+.demo-card__book {
+  --book-depth: 22px;
+  position: absolute;
+  inset: 0;
+  animation: book-spin 6s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.demo-card__face,
+.demo-card__edge {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.demo-card__face {
+  inset: 0;
+  border: 2px solid rgba(255, 248, 235, 0.9);
+}
+
+.demo-card__face--front {
+  background: var(--paper);
+  box-shadow: 0 0 52px rgba(243, 165, 189, 0.34);
+  transform: translateZ(calc(var(--book-depth) / 2));
+}
+
+.demo-card__face--back {
+  display: grid;
+  place-items: center;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 72% 22%, rgba(243, 165, 189, 0.48), transparent 34%),
+    linear-gradient(145deg, #161759, var(--navy));
+  transform: rotateY(180deg) translateZ(calc(var(--book-depth) / 2));
+}
+
+.demo-card__face--back span {
+  font-size: clamp(1.6rem, 8vw, 2.6rem);
+  font-weight: 950;
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+  text-align: center;
 }
 
 .demo-card img {
@@ -706,15 +750,36 @@ body[data-phase="demo"] .demo-card {
   object-fit: cover;
 }
 
-.demo-card__beam {
+.demo-card__edge {
+  top: 0;
+  bottom: 0;
+  width: var(--book-depth);
+  backface-visibility: visible;
+}
+
+.demo-card__edge--spine {
+  left: 0;
+  background: linear-gradient(90deg, #581828, var(--rose));
+  transform: translateX(calc(var(--book-depth) / -2)) rotateY(-90deg);
+}
+
+.demo-card__edge--pages {
+  right: 0;
+  background: repeating-linear-gradient(0deg, #efe3ca 0 2px, #fff8eb 2px 5px);
+  transform: translateX(calc(var(--book-depth) / 2)) rotateY(90deg);
+}
+
+.demo-card__shadow {
   position: absolute;
-  z-index: 2;
-  right: -16px;
-  left: -16px;
-  height: 2px;
-  background: var(--pink);
-  box-shadow: 0 0 22px var(--pink);
-  animation: scan 2.2s ease-in-out infinite;
+  z-index: -1;
+  right: 8%;
+  bottom: -42px;
+  left: 8%;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.58);
+  filter: blur(15px);
+  animation: book-shadow 2.5s ease-in-out infinite alternate;
 }
 
 .error-panel {
@@ -766,8 +831,19 @@ body[data-phase="demo"] .demo-card {
   50% { opacity: 0.35; }
 }
 
-@keyframes hover {
-  to { transform: translate(-50%, calc(-50% - 10px)) perspective(700px) rotateY(7deg) rotateZ(1deg); }
+@keyframes book-hover {
+  from { transform: translateY(7px) rotateZ(-2deg); }
+  to { transform: translateY(-9px) rotateZ(1deg); }
+}
+
+@keyframes book-spin {
+  from { transform: rotateX(-5deg) rotateY(0deg); }
+  to { transform: rotateX(-5deg) rotateY(360deg); }
+}
+
+@keyframes book-shadow {
+  from { opacity: 0.72; transform: scale(1); }
+  to { opacity: 0.42; transform: scale(0.78); }
 }
 
 @media (min-width: 760px) {

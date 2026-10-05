@@ -13,7 +13,7 @@
     <script defer src="./vendor/aframe-1.6.0.min.js"></script>
     <script defer src="./vendor/mindar-image-aframe-1.2.5.prod.js"></script>
   </head>
-  <body data-phase="intro">
+  <body data-phase="intro" data-recognition-source="cover">
     <main class="app-shell">
       <section class="ar-stage" aria-label="Book cover scanner">
         <a-scene
@@ -226,8 +226,19 @@
         <canvas id="scan-canvas" class="scan-canvas" aria-hidden="true"></canvas>
 
         <div id="demo-card" class="demo-card" aria-hidden="true">
-          <div class="demo-card__beam"></div>
-          <img id="demo-cover" src="./assets/i-robot-cover.jpg" alt="I, Robot cover" />
+          <div class="demo-card__float">
+            <div class="demo-card__book">
+              <div class="demo-card__face demo-card__face--front">
+                <img id="demo-cover" src="./assets/i-robot-cover.jpg" alt="I, Robot cover" />
+              </div>
+              <div class="demo-card__face demo-card__face--back" aria-hidden="true">
+                <span>LET<br />BOOKS<br />BE</span>
+              </div>
+              <div class="demo-card__edge demo-card__edge--spine" aria-hidden="true"></div>
+              <div class="demo-card__edge demo-card__edge--pages" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="demo-card__shadow" aria-hidden="true"></div>
         </div>
 
         <section id="intro-panel" class="intro-panel" aria-labelledby="intro-title">

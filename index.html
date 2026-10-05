@@ -120,63 +120,55 @@
 
           <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-          <a-entity id="book-target" class="book-target" data-target-index="0" mindar-image-target="targetIndex: 0">
+          <a-entity id="book-target" class="book-target" data-target-index="0" mindar-image-target="targetIndex: 0"></a-entity>
+          <a-entity
+            id="book-content"
+            position="0 0 0"
+            scale="0.001 0.001 0.001"
+            visible="false"
+            animation__reveal="property: scale; startEvents: reveal; pauseEvents: hide; from: 0.001 0.001 0.001; to: 1 1 1; dur: 520; easing: easeOutBack"
+          >
             <a-entity
-              id="book-content"
-              position="0 0 0"
-              scale="0.001 0.001 0.001"
-              animation__reveal="property: scale; startEvents: reveal; from: 0.001 0.001 0.001; to: 1 1 1; dur: 520; easing: easeOutBack"
+              position="0 0.2 0.3"
+              animation="property: position; from: 0 0.17 0.3; to: 0 0.23 0.3; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine"
             >
-              <a-plane
-                position="0 1.02 0.018"
-                width="1.68"
-                height="0.78"
-                material="shader: flat; color: #e93226; opacity: 0.98"
-              ></a-plane>
-              <a-plane
-                position="0 1.02 0.026"
-                width="1.62"
-                height="0.72"
-                material="shader: flat; color: #101010; opacity: 0.98"
-              ></a-plane>
-              <a-image
-                id="ar-cover"
-                src="#cover-i-robot"
-                position="-0.56 1.02 0.042"
-                width="0.42"
-                height="0.634"
-                rotation="0 -7 -2"
-                material="shader: flat"
-                animation="property: position; from: -0.56 0.99 0.042; to: -0.56 1.05 0.042; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine"
-              ></a-image>
-              <a-text
-                id="ar-kicker"
-                value="FOUND / BANTAM TRADE PAPERBACK"
-                position="-0.28 1.25 0.045"
-                color="#ef3b2f"
-                width="1.2"
-                wrap-count="31"
-                font="kelsonsans"
-              ></a-text>
-              <a-text
-                id="ar-title"
-                value="I, ROBOT"
-                position="-0.28 1.13 0.045"
-                color="#fffaf0"
-                width="1.4"
-                wrap-count="20"
-                font="kelsonsans"
-              ></a-text>
-              <a-text
-                id="ar-summary"
-                value="Nine linked stories trace humanity's uneasy partnership with intelligent machines—and the loopholes hidden inside the Three Laws of Robotics."
-                position="-0.28 1.01 0.045"
-                color="#d8d5cd"
-                width="1.15"
-                wrap-count="38"
-                line-height="49"
-                font="kelsonsans"
-              ></a-text>
+              <a-entity
+                id="ar-book"
+                animation="property: rotation; from: -5 0 -2; to: -5 360 -2; loop: true; dur: 6000; easing: linear"
+              >
+                <a-box width="0.52" height="0.78" depth="0.06" material="shader: flat; color: #efe3ca"></a-box>
+                <a-image
+                  id="ar-cover"
+                  src="#cover-i-robot"
+                  position="0 0 0.032"
+                  width="0.53"
+                  height="0.79"
+                  material="shader: flat"
+                ></a-image>
+                <a-plane
+                  position="0 0 -0.032"
+                  rotation="0 180 0"
+                  width="0.53"
+                  height="0.79"
+                  material="shader: flat; color: #05063a"
+                ></a-plane>
+                <a-plane
+                  position="-0.266 0 0"
+                  rotation="0 -90 0"
+                  width="0.064"
+                  height="0.79"
+                  material="shader: flat; color: #db3e62"
+                ></a-plane>
+                <a-text
+                  value="LET\nBOOKS\nBE"
+                  position="0 0 -0.034"
+                  rotation="0 180 0"
+                  align="center"
+                  color="#fff8eb"
+                  width="1.1"
+                  font="kelsonsans"
+                ></a-text>
+              </a-entity>
             </a-entity>
           </a-entity>
           <a-entity class="book-target" data-target-index="1" mindar-image-target="targetIndex: 1"></a-entity>

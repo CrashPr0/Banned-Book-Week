@@ -20,7 +20,7 @@ flowchart LR
     B --> H
     D --> H
     H --> I[On-device camera tracking]
-    I --> J[3D floating card + accessible HTML summary]
+    I --> J[3D floating and spinning book + accessible HTML summary]
 ```
 
 Build-time content acquisition and runtime AR are separate on purpose. The deployed app makes no scraping request and never needs catalog credentials.
@@ -31,29 +31,34 @@ Build-time content acquisition and runtime AR are separate on purpose. The deplo
 | --- | --- | --- |
 | `intro` | Page loaded or camera stopped | Shows exact edition and an explicit camera button. |
 | `starting` | User selects **Start camera** | Waits for the A-Frame scene, then calls `mindar-image-system.start()`. |
-| `scanning` | MindAR emits `arReady` | Shows the cover-shaped guide and searches all five compiled targets. |
-| `tracked` | One target emits `targetFound` | Looks up its `targetIndex`, swaps in that book’s cover and metadata, anchors the A-Frame card, and opens the HTML summary sheet. |
-| `lost` | Target emits `targetLost` | Hides the anchored card and briefly asks the user to move back to the cover. |
+| `scanning` | MindAR emits `arReady` | Shows the cover-shaped guide and searches all eighteen compiled targets, with a throttled QR fallback. |
+| `tracked` | A target emits `targetFound`, or a sticker is decoded | Cover matches attach the spinning 3D book to the physical anchor. QR matches show a spinning book in the camera overlay. Both open the HTML summary sheet. |
+| `lost` | Target emits `targetLost` | Hides the anchored book and briefly asks the user to move back to the cover. |
 | `error` | Preflight or MindAR emits an error | Gives a specific recovery message and a no-camera preview. |
-| `demo` | User selects the preview path | Simulates the discovered state without claiming that tracking occurred. |
+| `demo` | User selects a book preview, or follows a `?book=` QR link | Shows the spinning book without opening the camera, labeled as a preview or QR result. |
 
 The app does not call `getUserMedia()` separately. MindAR owns the single camera stream. `pagehide` and the exit control stop the tracking system so the browser releases the camera.
 
 ## Recognition and presentation
 
 - `public/data/books.json` assigns every book a stable ID and contiguous `targetIndex`.
-- `public/assets/banned-books.mind` contains all five covers in the exact order recorded by the manifest.
+- `public/assets/banned-books.mind` contains all eighteen covers in the exact order recorded by the manifest.
 - Each manifest entry connects its record, ISBN, local cover, summary, source URLs, review state, hashes, and compilation time.
-- Target 0 is the approved *I, Robot* cover. Targets 1–4 are explicit edition candidates until checked against the physical books.
-- The target-anchored scene displays a floating cover and short summary in 3D.
-- The DOM result sheet repeats the summary at normal reading size, remains keyboard accessible, and links to the SJSU King Library OneSearch catalog.
+- Target 0 is the approved *I, Robot* cover. Targets 1–17 are explicit edition candidates until checked against the physical books.
+- The target-anchored scene displays a floating 3D book with a six-second rotation. The HTML result sheet displays the summary, remains keyboard accessible, and links to the SJSU King Library OneSearch catalog.
+- The shared A-Frame entity stays in the scene DOM. Its Three.js object is attached to the matching anchor; reparenting the DOM entity tears down its components and can leave the reveal animation at an invisible scale.
+- A cover match owns the result while its anchor is visible. QR detection pauses during cover tracking; otherwise, reads run sequentially at least 250 milliseconds apart. Stopped scan sessions ignore late QR results.
+
+### Cover quality audit (October 5, 2026)
+
+The real detector matched 16 of the 18 configured reference images in a 640 × 960 test camera feed. This validates the saved images, not the editions currently on display. The current *Ulysses* image has very few stable tracking points; the *Dialogue Concerning Two New Sciences* image is a nearly blank cloth binding with no usable points at one tracking scale. Both failed that audit and need clearer reference photos of their exhibition copies (or distinctive title pages) before cover scanning can be considered reliable. Their existing QR stickers still work.
 
 ## Add another book
 
 1. Create one manifest entry with a stable internal ID, the next contiguous target index, exact edition identifiers, a human-written display summary, and provenance.
 2. Acquire an approved straight-on cover, decode and visually compare it with the exhibition copy, then store it locally.
 3. Compile the image and append it to a multi-target `.mind` file. Record the resulting `targetIndex` beside the book entry.
-4. Add one `mindar-image-target` anchor with the same index. The shared visual card is reparented to whichever anchor matches.
+4. Add one `mindar-image-target` anchor with the same index. The shared book’s Three.js object attaches to whichever anchor matches, without moving its DOM entity.
 5. Route every entity’s `targetFound` and `targetLost` event through the shared state controller.
 6. Test every physical cover for false positives and for robustness under realistic distance, angle, glare, and library stickers.
 

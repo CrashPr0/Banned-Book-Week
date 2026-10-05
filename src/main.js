@@ -29,9 +29,6 @@ const dom = {
   matchBadge: document.querySelector("#match-badge"),
   demoCover: document.querySelector("#demo-cover"),
   arCover: document.querySelector("#ar-cover"),
-  arTitle: document.querySelector("#ar-title"),
-  arKicker: document.querySelector("#ar-kicker"),
-  arSummary: document.querySelector("#ar-summary"),
   resultEyebrow: document.querySelector("#result-panel .eyebrow"),
 };
 
@@ -40,10 +37,11 @@ let arSystem = null;
 let books = [];
 let book = null;
 let activeTarget = null;
-let qrScanFrame = 0;
+let qrScanTimer = 0;
+let qrScanSession = 0;
 let barcodeDetector = null;
-let lastQrMatchAt = 0;
 let recognitionSource = "cover";
+const QR_SCAN_INTERVAL_MS = 250;
 const scanCanvasContext = dom.scanCanvas?.getContext("2d", { willReadFrequently: true });
 
 function targetLabel(data = book) {
@@ -126,10 +124,9 @@ function readableCameraError(error) {
 }
 
 function stopQrScanLoop() {
-  if (qrScanFrame) {
-    cancelAnimationFrame(qrScanFrame);
-    qrScanFrame = 0;
-  }
+  window.clearTimeout(qrScanTimer);
+  qrScanTimer = 0;
+  qrScanSession += 1;
 }
 
 function scanVideoElement() {
@@ -179,8 +176,9 @@ function setRecognitionSource(source) {
 }
 
 function handleQrMatch(matchedBook) {
-  lastQrMatchAt = performance.now();
-  if (book?.id !== matchedBook.id || phase !== "tracked") {
+  // A visible cover owns the result until MindAR loses its physical anchor.
+  if (activeTarget) return;
+  if (book?.id !== matchedBook.id || recognitionSource !== "qr" || phase !== "tracked") {
     setRecognitionSource("qr");
     applyBookData(matchedBook);
   }
@@ -205,37 +203,44 @@ async function detectQrFromVideo() {
   const height = video.videoHeight;
   if (!width || !height) return null;
 
-  const sample = Math.min(width, height, 720);
-  const sx = Math.floor((width - sample) / 2);
-  const sy = Math.floor((height - sample) / 2);
-  dom.scanCanvas.width = sample;
-  dom.scanCanvas.height = sample;
-  scanCanvasContext.drawImage(video, sx, sy, sample, sample, 0, 0, sample, sample);
+  const cropSize = Math.min(width, height);
+  const sample = Math.min(cropSize, 480);
+  const sx = Math.floor((width - cropSize) / 2);
+  const sy = Math.floor((height - cropSize) / 2);
+  if (dom.scanCanvas.width !== sample) {
+    dom.scanCanvas.width = sample;
+    dom.scanCanvas.height = sample;
+  }
+  scanCanvasContext.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, sample, sample);
   const imageData = scanCanvasContext.getImageData(0, 0, sample, sample);
   const code = jsQR(imageData.data, sample, sample, { inversionAttempts: "dontInvert" });
   return resolveBookFromPayload(code?.data);
 }
 
-function qrScanLoop() {
-  if (!arSystem || phase === "intro" || phase === "error" || phase === "collection") {
-    stopQrScanLoop();
-    return;
+async function qrScanLoop(session) {
+  const scanningPhases = ["scanning", "tracked", "lost"];
+  if (session !== qrScanSession || !arSystem || !scanningPhases.includes(phase)) return;
+
+  // Let MindAR keep its frame budget, and never overlap asynchronous QR reads.
+  if (!activeTarget) {
+    try {
+      const matched = await detectQrFromVideo();
+      if (session === qrScanSession && scanningPhases.includes(phase) && matched) {
+        handleQrMatch(matched);
+      }
+    } catch (error) {
+      console.warn("QR detection frame failed.", error);
+    }
   }
 
-  detectQrFromVideo()
-    .then((matched) => {
-      if (matched) handleQrMatch(matched);
-    })
-    .catch((error) => {
-      console.warn("QR detection frame failed.", error);
-    });
-
-  qrScanFrame = requestAnimationFrame(qrScanLoop);
+  if (session === qrScanSession && scanningPhases.includes(phase)) {
+    qrScanTimer = window.setTimeout(() => qrScanLoop(session), QR_SCAN_INTERVAL_MS);
+  }
 }
 
 function startQrScanLoop() {
   stopQrScanLoop();
-  qrScanFrame = requestAnimationFrame(qrScanLoop);
+  void qrScanLoop(qrScanSession);
 }
 
 async function startCamera() {
@@ -257,7 +262,6 @@ async function startCamera() {
     arSystem = dom.scene.systems["mindar-image-system"];
     if (!arSystem?.start) throw new Error("The image-tracking engine did not load.");
     await arSystem.start();
-    startQrScanLoop();
   } catch (error) {
     showError(readableCameraError(error));
   } finally {
@@ -272,7 +276,7 @@ async function stopCamera() {
   } catch {
     // The browser may have already released the stream during page teardown.
   }
-  dom.content.setAttribute("scale", "0.001 0.001 0.001");
+  hideArContent();
   activeTarget = null;
   book = null;
   setRecognitionSource("cover");
@@ -281,11 +285,13 @@ async function stopCamera() {
 }
 
 function showError(message) {
+  stopQrScanLoop();
   dom.errorMessage.textContent = message;
   setPhase("error");
 }
 
 function openDemo(matchedBook) {
+  stopQrScanLoop();
   if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
   if (!matchedBook) {
     openCollection();
@@ -297,6 +303,7 @@ function openDemo(matchedBook) {
 }
 
 function openCollection() {
+  stopQrScanLoop();
   if (phase !== "intro" && phase !== "error" && phase !== "collection") arSystem?.stop?.();
   setPhase("collection");
   dom.collectionClose.focus();
@@ -335,10 +342,11 @@ function applyBookData(data) {
   dom.demoCover.src = data.coverPath;
   dom.demoCover.alt = coverAlt;
 
-  dom.arCover.setAttribute("src", coverSelector);
-  dom.arTitle.setAttribute("value", data.title.toUpperCase());
-  dom.arKicker.setAttribute("value", `FOUND / ${status}`);
-  dom.arSummary.setAttribute("value", data.arSummary);
+  if (dom.arCover.getAttribute("src") !== coverSelector) {
+    // A-Frame reuses image textures, but WebGL cannot resize their immutable storage.
+    dom.arCover.setAttribute("material", "src", "");
+    dom.arCover.setAttribute("src", coverSelector);
+  }
 }
 
 function renderCollection() {
@@ -410,23 +418,32 @@ dom.scene.addEventListener("arError", (event) => {
   showError(readableCameraError(event.detail?.error || event.detail));
 });
 
+function hideArContent() {
+  dom.content.emit("hide", null, false);
+  dom.content.setAttribute("visible", false);
+  dom.content.setAttribute("scale", "0.001 0.001 0.001");
+}
+
 for (const target of dom.targets) {
   target.addEventListener("targetFound", () => {
     const targetIndex = Number(target.dataset.targetIndex);
     const matchedBook = books[targetIndex];
     if (!matchedBook) return;
     activeTarget = target;
-    target.appendChild(dom.content);
+    // Moving an A-Frame DOM entity tears down its geometry and animation.
+    // Attach only its Three.js object so the initialized components stay alive.
+    target.object3D.add(dom.content.object3D);
     setRecognitionSource("cover");
     applyBookData(matchedBook);
     dom.content.setAttribute("scale", "0.001 0.001 0.001");
-    dom.content.emit("reveal");
+    dom.content.setAttribute("visible", true);
+    dom.content.emit("reveal", null, false);
     setPhase("tracked");
   });
 
   target.addEventListener("targetLost", () => {
     if (target !== activeTarget) return;
-    dom.content.setAttribute("scale", "0.001 0.001 0.001");
+    hideArContent();
     activeTarget = null;
     setPhase("lost");
     window.setTimeout(() => {

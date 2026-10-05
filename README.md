@@ -1,6 +1,6 @@
 # Banned Books AR
 
-A mobile-first MindAR experience for eighteen book-cover targets (seventeen from the installation sheet plus *I, Robot*). The event-first landing page uses the supplied 2026 **Let Books Be** campaign banner; no individual title is presented as the main theme. Point the camera at a configured front cover and the app selects the matching title, then anchors a floating cover/summary card above it. A normal HTML summary panel appears at the same time for readability and accessibility.
+A mobile-first MindAR experience for eighteen book-cover targets (seventeen from the installation sheet plus *I, Robot*). The event-first landing page uses the supplied 2026 **Let Books Be** campaign banner; no individual title is presented as the main theme. Point the camera at a configured front cover and the app selects the matching title, then anchors a floating, spinning 3D book over it. A normal HTML summary panel appears at the same time for readability and accessibility.
 
 The current target pack contains the approved 2008 Bantam trade paperback of *I, Robot* plus seventeen intake-sheet cover candidates from the Banned Books Week placement list. Candidate covers should still be compared with the physical installation copies when possible.
 
@@ -18,6 +18,8 @@ npm run dev
 ```
 
 Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. **Browse all featured books** opens the cover collection and exercises any title’s result state without camera access. A sticker QR opens the same preview for one title: `?book=` plus the book id, for example `?book=candide`.
+
+The scanner also recognizes stickers in the same live camera stream. QR decoding runs at most four times per second and pauses while a cover is tracked, giving MindAR the processing time and result priority it needs.
 
 Printable sticker sheet for the 17 Underground books titles:
 
@@ -76,6 +78,16 @@ Open the printed loopback URL once. The page runs MindAR 1.2.5’s compiler in t
 See [docs/AR_LOGIC.md](docs/AR_LOGIC.md) for the state machine, data flow, and the path to more books.
 
 ## Production checks
+
+Browser regression check, with `npm run dev -- --port 4175` running and `playwright-cli` available:
+
+```bash
+playwright-cli -s=scanner-test open http://127.0.0.1:4175/
+playwright-cli -s=scanner-test run-code --filename=scripts/test-scanner-browser.js
+playwright-cli -s=scanner-test close
+```
+
+This passes actual cover and QR images through a canvas camera stream to the real detectors. It checks visible AR geometry, switching between books and scan methods, animation, target loss, camera restart, and QR deep links.
 
 - Test the actual library copy, not only an image on a second screen. Jackets, stickers, glare, and reprints can change recognition.
 - Confirm cover reproduction rights before public launch. The repository records provenance, not a license grant.

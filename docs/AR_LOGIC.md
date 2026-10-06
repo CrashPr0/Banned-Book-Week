@@ -30,12 +30,14 @@ Build-time content acquisition and runtime AR are separate on purpose. The deplo
 | Phase | Trigger | Interface behavior |
 | --- | --- | --- |
 | `intro` | Page loaded or camera stopped | Shows exact edition and an explicit camera button. |
-| `starting` | User selects **Start camera** | Waits for the A-Frame scene, then calls `mindar-image-system.start()`. |
+| `starting` | User selects **Start camera**, or opens a valid `?book=` QR link | Waits for the A-Frame scene, then calls `mindar-image-system.start()` and requests camera access. |
 | `scanning` | MindAR emits `arReady` | Shows the cover-shaped guide and searches all eighteen compiled targets, with a throttled QR fallback. |
 | `tracked` | A target emits `targetFound`, or a sticker is decoded | Cover matches attach the spinning 3D book to the physical anchor. QR matches show a spinning book in the camera overlay. Both open the HTML summary sheet. |
 | `lost` | Target emits `targetLost` | Hides the anchored book and briefly asks the user to move back to the cover. |
 | `error` | Preflight or MindAR emits an error | Gives a specific recovery message and a no-camera preview. |
-| `demo` | User selects a book preview, or follows a `?book=` QR link | Shows the spinning book without opening the camera, labeled as a preview or QR result. |
+| `demo` | User explicitly selects a book preview | Shows the spinning book without opening the camera, labeled as a preview. |
+
+A valid QR deep link keeps its book selected during camera startup. When MindAR emits `arReady`, that book is immediately presented over the live camera feed with its summary, and both QR and cover recognition remain active. Camera errors offer **Start AR** for the selected book and an explicit **View book preview** fallback. A bare homepage or an unknown book ID does not automatically open the camera.
 
 The app does not call `getUserMedia()` separately. MindAR owns the single camera stream. `pagehide` and the exit control stop the tracking system so the browser releases the camera.
 

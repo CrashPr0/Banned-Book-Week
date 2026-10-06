@@ -15,6 +15,7 @@ const dom = {
   collectionClose: document.querySelector("#collection-close"),
   resultPanel: document.querySelector("#result-panel"),
   errorPanel: document.querySelector("#error-panel"),
+  errorTitle: document.querySelector("#error-panel h2"),
   errorMessage: document.querySelector("#error-message"),
   startButton: document.querySelector("#start-button"),
   demoButton: document.querySelector("#demo-button"),
@@ -37,6 +38,8 @@ let arSystem = null;
 let books = [];
 let book = null;
 let activeTarget = null;
+let qrLaunchBook = null;
+let cameraStartVersion = 0;
 let qrScanTimer = 0;
 let qrScanSession = 0;
 let barcodeDetector = null;
@@ -115,6 +118,9 @@ function waitForScene() {
 }
 
 function readableCameraError(error) {
+  if (error === "VIDEO_FAIL") {
+    return "The camera could not open. Allow camera access in your browser, then try again.";
+  }
   if (error?.name === "NotAllowedError") {
     return "Camera permission was denied. Allow camera access in your browser settings, then try again.";
   }
@@ -130,7 +136,7 @@ function stopQrScanLoop() {
 }
 
 function scanVideoElement() {
-  return dom.scene?.querySelector("video") ?? document.querySelector("video");
+  return arSystem?.video ?? dom.scene?.querySelector("video") ?? document.querySelector("video");
 }
 
 async function createBarcodeDetector() {
@@ -244,6 +250,7 @@ function startQrScanLoop() {
 }
 
 async function startCamera() {
+  if (phase === "starting") return;
   const preflightError = cameraPreflight();
   if (preflightError) {
     showError(preflightError);
@@ -254,30 +261,51 @@ async function startCamera() {
     return;
   }
 
+  const startVersion = ++cameraStartVersion;
   setPhase("starting");
   dom.startButton.disabled = true;
+  dom.retryButton.disabled = true;
   try {
     await waitForScene();
+    if (startVersion !== cameraStartVersion) return;
     barcodeDetector = await createBarcodeDetector();
+    if (startVersion !== cameraStartVersion) return;
     arSystem = dom.scene.systems["mindar-image-system"];
     if (!arSystem?.start) throw new Error("The image-tracking engine did not load.");
     await arSystem.start();
   } catch (error) {
-    showError(readableCameraError(error));
+    if (startVersion === cameraStartVersion) showError(readableCameraError(error));
   } finally {
-    dom.startButton.disabled = false;
+    if (startVersion === cameraStartVersion || phase !== "starting") {
+      dom.startButton.disabled = false;
+      dom.retryButton.disabled = false;
+    }
   }
 }
 
-async function stopCamera() {
+function releaseCamera() {
+  cameraStartVersion += 1;
   stopQrScanLoop();
+  hideArContent();
+  activeTarget = null;
+  const video = arSystem?.video;
+  if (!video) return;
   try {
-    await arSystem?.stop?.();
+    if (video.srcObject && arSystem.controller) {
+      arSystem.stop();
+      return;
+    }
+    arSystem?.controller?.stopProcessVideo?.();
   } catch {
     // The browser may have already released the stream during page teardown.
   }
-  hideArContent();
-  activeTarget = null;
+  video.srcObject?.getTracks().forEach((track) => track.stop());
+  video.remove();
+}
+
+function stopCamera() {
+  releaseCamera();
+  qrLaunchBook = null;
   book = null;
   setRecognitionSource("cover");
   document.title = "Let Books Be — Banned Books Week AR";
@@ -285,14 +313,17 @@ async function stopCamera() {
 }
 
 function showError(message) {
-  stopQrScanLoop();
-  dom.errorMessage.textContent = message;
+  releaseCamera();
+  dom.errorTitle.textContent = qrLaunchBook ? "Start AR for this book." : "Use the visual preview instead.";
+  dom.errorMessage.textContent = qrLaunchBook ? `${qrLaunchBook.title} is ready. ${message}` : message;
+  dom.retryButton.textContent = qrLaunchBook ? "START AR" : "TRY AGAIN";
+  dom.fallbackButton.textContent = qrLaunchBook ? "View book preview" : "Browse collection";
   setPhase("error");
 }
 
 function openDemo(matchedBook) {
-  stopQrScanLoop();
-  if (phase !== "intro" && phase !== "error") arSystem?.stop?.();
+  releaseCamera();
+  qrLaunchBook = null;
   if (!matchedBook) {
     openCollection();
     return;
@@ -303,8 +334,8 @@ function openDemo(matchedBook) {
 }
 
 function openCollection() {
-  stopQrScanLoop();
-  if (phase !== "intro" && phase !== "error" && phase !== "collection") arSystem?.stop?.();
+  releaseCamera();
+  qrLaunchBook = null;
   setPhase("collection");
   dom.collectionClose.focus();
 }
@@ -395,9 +426,10 @@ async function loadBookData() {
     const countEl = document.querySelector("#intro-target-count");
     if (countEl) countEl.textContent = countLabel;
     if (deepLinked) {
+      qrLaunchBook = deepLinked;
       setRecognitionSource("qr");
       applyBookData(deepLinked);
-      setPhase("demo");
+      await startCamera();
     } else {
       book = null;
       document.title = "Let Books Be — Banned Books Week AR";
@@ -411,10 +443,20 @@ async function loadBookData() {
 }
 
 dom.scene.addEventListener("arReady", () => {
+  if (phase !== "starting") {
+    // MindAR can finish loading after the visitor exits. Stop after its event
+    // handler returns, since it starts processing video immediately afterwards.
+    window.setTimeout(() => {
+      if (!["starting", "scanning", "tracked", "lost"].includes(phase)) releaseCamera();
+    }, 0);
+    return;
+  }
   setPhase("scanning");
+  if (qrLaunchBook) handleQrMatch(qrLaunchBook);
   startQrScanLoop();
 });
 dom.scene.addEventListener("arError", (event) => {
+  if (!["starting", "scanning", "tracked", "lost"].includes(phase)) return;
   showError(readableCameraError(event.detail?.error || event.detail));
 });
 
@@ -426,6 +468,7 @@ function hideArContent() {
 
 for (const target of dom.targets) {
   target.addEventListener("targetFound", () => {
+    if (!["scanning", "tracked", "lost"].includes(phase)) return;
     const targetIndex = Number(target.dataset.targetIndex);
     const matchedBook = books[targetIndex];
     if (!matchedBook) return;
@@ -455,7 +498,10 @@ for (const target of dom.targets) {
 dom.startButton.addEventListener("click", startCamera);
 dom.demoButton.addEventListener("click", openCollection);
 dom.retryButton.addEventListener("click", startCamera);
-dom.fallbackButton.addEventListener("click", openCollection);
+dom.fallbackButton.addEventListener("click", () => {
+  if (qrLaunchBook) openDemo(qrLaunchBook);
+  else openCollection();
+});
 dom.exitButton.addEventListener("click", stopCamera);
 dom.collectionClose.addEventListener("click", closeCollection);
 
@@ -465,8 +511,7 @@ window.addEventListener("keydown", (event) => {
   else stopCamera();
 });
 window.addEventListener("pagehide", () => {
-  stopQrScanLoop();
-  arSystem?.stop?.();
+  releaseCamera();
 });
 
 loadBookData();

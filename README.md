@@ -17,7 +17,7 @@ npm run check:target
 npm run dev
 ```
 
-Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. **Browse all featured books** opens the cover collection and exercises any title’s result state without camera access. A sticker QR opens the same preview for one title: `?book=` plus the book id, for example `?book=candide`.
+Open the printed local URL. Camera access works on `localhost`; a phone build must be served over HTTPS. **Browse all featured books** opens the cover collection and exercises any title’s result state without camera access. A sticker QR opens the live AR scanner for one title: `?book=` plus the book id, for example `?book=candide`. The app immediately requests camera access and shows the selected floating book over the live feed once the camera is ready. If camera access is blocked, **Start AR** retries for the same book; **View book preview** is an explicit no-camera fallback. Existing printed QR stickers work without reprinting.
 
 The scanner also recognizes stickers in the same live camera stream. QR decoding runs at most four times per second and pauses while a cover is tracked, giving MindAR the processing time and result priority it needs.
 

@@ -90,7 +90,7 @@ const html = `<!doctype html>
   </head>
   <body>
     <h1>Underground books QR stickers</h1>
-    <p class="note">Print these and place one with each copy. A phone camera opens the public Banned Books page for that title.</p>
+    <p class="note">Print these and place one with each copy. Scan a code to open the AR scanner for that title, then allow camera access.</p>
     <div class="sheet">
 ${cards}
     </div>
